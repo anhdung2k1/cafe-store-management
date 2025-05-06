@@ -6,8 +6,9 @@
 *.lo
 *.o
 *.obj
-/authentication/.idea
-/authentication/authentication/target/
+/authentication/.idea/
+/authentication/.vscode/
+/authentication/target/
 
 # Precompiled Headers
 *.gch

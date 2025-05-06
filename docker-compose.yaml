@@ -22,7 +22,7 @@ services:
     image: authentication:latest
     container_name: authentication
     build:
-      context: ./authentication/authentication
+      context: ./authentication
       dockerfile: ./Dockerfile
     ports:
       - "9090:9090"
