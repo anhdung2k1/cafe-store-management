@@ -24,19 +24,19 @@ public class UserController {
     }
     // Get User by Id
     @GetMapping(value = "/users/{id}")
-    public ResponseEntity<Map<String, Object>> getUserById(@PathVariable("id") Long id) throws Exception{
+    public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long id) throws Exception{
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     //Get User by Name
     @GetMapping(value= "/users/search")
-    public ResponseEntity<List<Map<String, Object>>> getUserByName(@RequestParam("userName") String userName) throws Exception {
+    public ResponseEntity<List<Map<String, Object>>> getUserByName(@RequestParam String userName) throws Exception {
         return ResponseEntity.ok(userService.getUserByName(userName));
     }
 
     // Get User_id by User name
     @GetMapping(value = "/users/find")
-    public ResponseEntity<Map<String, Long>> getUserIdByUserName(@RequestParam("user_name") String userName) throws Exception {
+    public ResponseEntity<Map<String, Long>> getUserIdByUserName(@RequestParam String userName) throws Exception {
         return ResponseEntity.ok(userService.getUserIdByUserName(userName));
     }
 

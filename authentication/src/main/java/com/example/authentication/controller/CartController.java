@@ -15,15 +15,15 @@ public class CartController {
         this.cartService = cartService;
     }
     @GetMapping(value = "/carts/user/{userId}")
-    public ResponseEntity<Map<String, Object>> getCartItemsByUserId(@PathVariable("userId") Long userId) throws Exception {
+    public ResponseEntity<Map<String, Object>> getCartItemsByUserId(@PathVariable Long userId) throws Exception {
         return ResponseEntity.ok(cartService.getCartItems(userId));
     }
     @PostMapping(value = "/carts/user/{userId}")
-    public ResponseEntity<Map<String, Object>> createCartItems(@PathVariable("userId") Long userId, @RequestBody Product product) throws Exception {
+    public ResponseEntity<Map<String, Object>> createCartItems(@PathVariable Long userId, @RequestBody Product product) throws Exception {
         return ResponseEntity.ok(cartService.addCartItems(userId, product));
     }
     @PatchMapping(value = "/carts/user/{userId}")
-    public ResponseEntity<Map<String, Object>> updateCartItems(@PathVariable("userId") Long userId, @RequestBody Product product) throws Exception {
+    public ResponseEntity<Map<String, Object>> updateCartItems(@PathVariable Long userId, @RequestBody Product product) throws Exception {
         return ResponseEntity.ok(cartService.updateCartItems(userId, product));
     }
 }

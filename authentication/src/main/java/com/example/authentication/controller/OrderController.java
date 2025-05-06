@@ -18,19 +18,19 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
     @GetMapping(value = "/orders/{userID}")
-    public ResponseEntity<List<Map<String, Object>>> getAllOrdersByUserID(@PathVariable("userID") Long userID) throws Exception {
+    public ResponseEntity<List<Map<String, Object>>> getAllOrdersByUserID(@PathVariable Long userID) throws Exception {
         return ResponseEntity.ok(orderService.getAllOrdersByUserID(userID));
     }
     @GetMapping(value = "/orders/order/{orderID}")
-    public ResponseEntity<Map<String, Object>> getOrderByOrderID(@PathVariable("orderID") Long orderID) throws Exception {
+    public ResponseEntity<Map<String, Object>> getOrderByOrderID(@PathVariable Long orderID) throws Exception {
         return ResponseEntity.ok(orderService.getOrderByID(orderID));
     }
     @PatchMapping(value = "/orders/order/{orderID}")
-    public ResponseEntity<Map<String, Object>> updateOrder(@PathVariable("orderID") Long orderID, @RequestBody String orderStatus) throws Exception {
+    public ResponseEntity<Map<String, Object>> updateOrder(@PathVariable Long orderID, @RequestBody String orderStatus) throws Exception {
         return ResponseEntity.ok(orderService.updateOrder(orderID, orderStatus));
     }
     @DeleteMapping(value = "/orders/order/{orderID}")
-    public ResponseEntity<Map<String, Boolean>> deleteOrder(@PathVariable("orderID") Long orderID) throws Exception {
+    public ResponseEntity<Map<String, Boolean>> deleteOrder(@PathVariable Long orderID) throws Exception {
         return ResponseEntity.ok(new HashMap<>() {{
             put("deleted", orderService.deleteOrder(orderID));
         }});

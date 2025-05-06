@@ -51,19 +51,19 @@ public class ProductController {
 
     // Get Product by ID
     @GetMapping(value = "/products/{productId}")
-    public ResponseEntity<Map<String, Object>> getProductById(@PathVariable("productId") Long productId) throws Exception {
+    public ResponseEntity<Map<String, Object>> getProductById(@PathVariable Long productId) throws Exception {
         return ResponseEntity.ok(productService.getProductById(productId));
     }
 
     // Update Product
     @PatchMapping(value = "/products/{productId}")
-    public ResponseEntity<Boolean> updateProduct(@PathVariable("productId") Long productId, @RequestBody Product product) throws Exception {
+    public ResponseEntity<Boolean> updateProduct(@PathVariable Long productId, @RequestBody Product product) throws Exception {
         return ResponseEntity.ok(productService.updateProductInformation(productId, product));
     }
 
     // Delete Product
     @DeleteMapping(value = "/products/{productId}")
-    public ResponseEntity<Map<String, Boolean>> deleteProduct(@PathVariable("productId") Long productId) throws Exception {
+    public ResponseEntity<Map<String, Boolean>> deleteProduct(@PathVariable Long productId) throws Exception {
         return ResponseEntity.ok(new HashMap<>() {{
             put("deleted", productService.deleteProduct(productId));
         }});

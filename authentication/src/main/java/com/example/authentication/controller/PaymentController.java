@@ -23,7 +23,7 @@ public class PaymentController {
     }
     // Get all Payments by customer ID
     @GetMapping(value = "/payments/user/{userId}")
-    public ResponseEntity<List<Map<String, Object>>> getAllPaymentByCustomerId(@PathVariable("userId") Long userId) throws Exception{
+    public ResponseEntity<List<Map<String, Object>>> getAllPaymentByCustomerId(@PathVariable Long userId) throws Exception{
         return ResponseEntity.ok(paymentService.getAllPaymentByUserId(userId));
     }
     // Get all Payments by Product ID
@@ -33,17 +33,17 @@ public class PaymentController {
     }
     // Get Payment By ID
     @GetMapping(value = "/payments/{paymentId}")
-    public ResponseEntity<Map<String, Object>> getPaymentById(@PathVariable("paymentId") Long paymentId) throws Exception {
+    public ResponseEntity<Map<String, Object>> getPaymentById(@PathVariable Long paymentId) throws Exception {
         return ResponseEntity.ok(paymentService.getPaymentById(paymentId));
     }
     // Update Payment
     @PatchMapping(value = "/payments/{paymentId}")
-    public ResponseEntity<Payment> updatePayment(@PathVariable("paymentId") Long paymentId, @RequestBody Payment payment) throws Exception {
+    public ResponseEntity<Payment> updatePayment(@PathVariable Long paymentId, @RequestBody Payment payment) throws Exception {
         return ResponseEntity.ok(paymentService.updatePayment(paymentId, payment));
     }
     // Delete Payment
     @DeleteMapping(value = "/payments/{paymentId}")
-    public ResponseEntity<Map<String, Boolean>> deletePayment(@PathVariable("paymentId") Long paymentId) throws Exception {
+    public ResponseEntity<Map<String, Boolean>> deletePayment(@PathVariable Long paymentId) throws Exception {
         return ResponseEntity.ok(new HashMap<>() {{
             put("deleted", paymentService.deletePayment(paymentId));
         }});

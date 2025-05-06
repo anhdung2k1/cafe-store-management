@@ -43,13 +43,13 @@ public class AccountController {
 
     // Get account id by user name
     @GetMapping(value = "/accounts/find")
-    public ResponseEntity<Long> getAccIdByUserName (@RequestParam("userName") String userName) throws Exception {
+    public ResponseEntity<Long> getAccIdByUserName (@RequestParam String userName) throws Exception {
         return ResponseEntity.ok(accountService.getAccIdByUserName(userName));
     }
 
     // Check the account is Admin
     @GetMapping(value = "/accounts/admin")
-    public ResponseEntity<Boolean> checkAdminAccount(@RequestParam("userName") String userName) throws Exception {
+    public ResponseEntity<Boolean> checkAdminAccount(@RequestParam String userName) throws Exception {
         return ResponseEntity.ok(accountService.checkAdminAccount(userName));
     }
 

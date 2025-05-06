@@ -38,7 +38,7 @@ public class PermissionController {
     }
     // Delete Permission By Permission ID
     @DeleteMapping(value = "/permissions/{permissionId}")
-    public ResponseEntity<Map<String,Boolean>> deleteRole(@PathVariable("permissionId") Long permissionId) throws Exception {
+    public ResponseEntity<Map<String,Boolean>> deleteRole(@PathVariable Long permissionId) throws Exception {
         return ResponseEntity.ok(new HashMap<>() {{
             put("deleted",permissionService.deletePermission(permissionId));
         }});
