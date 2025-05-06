@@ -1,0 +1,49 @@
+server:
+  port: 9090
+
+#Get the ENV from k8s, docker env
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:172.25.203.217}:${DB_PORT:3306}/${DB_NAME:cafe_shop}
+    username: ${DB_USERNAME:cafe_user}
+    password: ${DB_PASSWORD:cafe_password}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+  health:
+    db:
+      enabled: true
+
+
+cors:
+  allowed-origins: http://localhost, http://127.0.0.1, http://localhost:3000, http://127.0.0.1:3000
+
+# AWS Cloud Configuration
+cloud:
+  aws:
+    credentials:
+      access-key:
+      secret-key:
+    region:
+      static: us-east-1
+    stack:
+      auto: false
+
+bucket:
+  name: cafe-bucket
+
+jwt:
+  signerKey: "655368566D597133743677397A244326452948404D635166546A576E5A723475"
