@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -30,6 +31,7 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
         this.items = items;
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
@@ -63,7 +65,7 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
         return items.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView titleTxt, extraTxt, priceTxt;
         RatingBar ratingBar;

@@ -19,7 +19,6 @@ import java.util.List;
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
 
     private final List<CategoryModel> items;
-    private Context context;
     private int selectedPosition = -1;
     private int lastSelectedPosition = -1;
 
@@ -30,7 +29,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     @NonNull
     @Override
     public CategoryAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext();
+        Context context = parent.getContext();
         View view = LayoutInflater.from(context).inflate(R.layout.viewholder_category, parent, false);
         return new ViewHolder(view);
     }

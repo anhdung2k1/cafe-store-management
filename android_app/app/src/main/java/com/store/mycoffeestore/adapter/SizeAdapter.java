@@ -11,8 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.store.mycoffeestore.R;
+import com.store.mycoffeestore.helper.SizeSelectListener;
 
 import java.util.List;
 
@@ -20,12 +20,14 @@ public class SizeAdapter extends RecyclerView.Adapter<SizeAdapter.ViewHolder> {
 
     private final Context context;
     private final List<String> items;
+    private final SizeSelectListener listener;
     private int selectedPosition = -1;
     private int lastSelectedPosition = -1;
 
-    public SizeAdapter(Context context, List<String> items) {
+    public SizeAdapter(Context context, List<String> items, SizeSelectListener listener) {
         this.context = context;
         this.items = items;
+        this.listener = listener;
     }
 
     @NonNull
@@ -38,10 +40,19 @@ public class SizeAdapter extends RecyclerView.Adapter<SizeAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull SizeAdapter.ViewHolder holder, int position) {
         holder.root.setOnClickListener(v -> {
+            int currentPosition = holder.getAdapterPosition();
+            if (currentPosition == RecyclerView.NO_POSITION) return;
+
             lastSelectedPosition = selectedPosition;
-            selectedPosition = position;
+            selectedPosition = currentPosition;
+
             notifyItemChanged(lastSelectedPosition);
             notifyItemChanged(selectedPosition);
+
+            // ✅ Callback to notify selected size
+            if (listener != null) {
+                listener.onSizeSelected(items.get(currentPosition));
+            }
         });
 
         if (selectedPosition == position) {
@@ -50,25 +61,7 @@ public class SizeAdapter extends RecyclerView.Adapter<SizeAdapter.ViewHolder> {
             holder.coffee.setBackgroundResource(R.drawable.size_bg);
         }
 
-        int imageSize;
-        switch (position) {
-            case 0:
-                imageSize = dpToPx(45);
-                break;
-            case 1:
-                imageSize = dpToPx(50);
-                break;
-            case 2:
-                imageSize = dpToPx(55);
-                break;
-            case 3:
-                imageSize = dpToPx(65);
-                break;
-            default:
-                imageSize = dpToPx(70);
-                break;
-        }
-
+        int imageSize = getSizeForPosition(position);
         ViewGroup.LayoutParams layoutParams = holder.coffee.getLayoutParams();
         layoutParams.width = imageSize;
         layoutParams.height = imageSize;
@@ -83,6 +76,16 @@ public class SizeAdapter extends RecyclerView.Adapter<SizeAdapter.ViewHolder> {
     private int dpToPx(int dp) {
         return Math.round(TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics()));
+    }
+
+    private int getSizeForPosition(int position) {
+        switch (position) {
+            case 0: return dpToPx(45);
+            case 1: return dpToPx(50);
+            case 2: return dpToPx(55);
+            case 3: return dpToPx(65);
+            default: return dpToPx(70);
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

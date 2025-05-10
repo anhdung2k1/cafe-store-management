@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -15,12 +16,19 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.store.mycoffeestore.R;
+import com.store.mycoffeestore.api.ApiClient;
+import com.store.mycoffeestore.api.ApiService;
+import com.store.mycoffeestore.helper.TokenManager;
+import com.store.mycoffeestore.model.Accounts;
+import com.store.mycoffeestore.model.AuthenticationResponse;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignInActivity extends AppCompatActivity {
 
     private EditText email, password;
-    private MaterialButton btnLogin;
-    private TextView textSignupPrompt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,27 +45,46 @@ public class SignInActivity extends AppCompatActivity {
         // Initialize views
         email = findViewById(R.id.editTextEmail);
         password = findViewById(R.id.editTextPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        textSignupPrompt = findViewById(R.id.textSignupPrompt);
+        MaterialButton btnLogin = findViewById(R.id.btnLogin);
+        TextView textSignupPrompt = findViewById(R.id.textSignupPrompt);
 
         // Handle login
         btnLogin.setOnClickListener(v -> {
-            String email = this.email.getText().toString().trim();
-            String password = this.password.getText().toString().trim();
+            String emailInput = email.getText().toString().trim();
+            String passwordInput = password.getText().toString().trim();
 
-            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+            if (TextUtils.isEmpty(emailInput) || TextUtils.isEmpty(passwordInput)) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (email.equals("admin@admin") && password.equals("12345678")) {
-                // Successful login
-                Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish(); // Optional: prevent going back to login screen
-            } else {
-                Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show();
-            }
+            // Create account request object
+            Accounts account = new Accounts(emailInput, passwordInput);
+
+            // Call API using Retrofit
+            ApiService apiService = ApiClient.getAuthApiService();
+            apiService.signIn(account).enqueue(new Callback<>() {
+                @Override
+                public void onResponse(@NonNull Call<AuthenticationResponse> call, @NonNull Response<AuthenticationResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        // Save JWT token to SharedPreferences
+                        String token = response.body().getToken();
+                        TokenManager tokenManager = new TokenManager(SignInActivity.this);
+                        tokenManager.saveToken(token);
+
+                        Toast.makeText(SignInActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                        finish();
+                    } else {
+                        Toast.makeText(SignInActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<AuthenticationResponse> call, Throwable t) {
+                    Toast.makeText(SignInActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         // Navigate to Sign Up
