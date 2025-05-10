@@ -59,30 +59,30 @@ public class MainActivity extends AppCompatActivity {
     private void initCategory() {
         progressBarCategory.setVisibility(View.VISIBLE);
         viewModel.getCategory().observe(this, items -> {
-            recyclerViewCategory.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
+            recyclerViewCategory.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
             recyclerViewCategory.setAdapter(new CategoryAdapter(items));
             progressBarCategory.setVisibility(View.GONE);
         });
-        viewModel.loadCategory();
+        viewModel.loadCategory(getApplicationContext());
     }
 
     private void initPopular() {
         progressBarPopular.setVisibility(View.VISIBLE);
         viewModel.getPopular().observe(this, items -> {
-            recyclerViewPopular.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
+            recyclerViewPopular.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
             recyclerViewPopular.setAdapter(new PopularAdapter(items));
             progressBarPopular.setVisibility(View.GONE);
         });
-        viewModel.loadPopular();
+        viewModel.loadPopular(getApplicationContext());
     }
 
     private void initOffer() {
         progressBarOffer.setVisibility(View.VISIBLE);
         viewModel.getOffer().observe(this, items -> {
-            recyclerViewOffer.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
+            recyclerViewOffer.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
             recyclerViewOffer.setAdapter(new OffersAdapter(items));
             progressBarOffer.setVisibility(View.GONE);
         });
-        viewModel.loadOffer();
+        viewModel.loadOffer(getApplicationContext());
     }
 }

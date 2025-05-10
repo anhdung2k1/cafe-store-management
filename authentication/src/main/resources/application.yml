@@ -35,15 +35,15 @@ cors:
 cloud:
   aws:
     credentials:
-      access-key:
-      secret-key:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
     region:
       static: us-east-1
     stack:
       auto: false
 
 bucket:
-  name: cafe-bucket
+  name: product-bucket-storage
 
 jwt:
   signerKey: "655368566D597133743677397A244326452948404D635166546A576E5A723475"
