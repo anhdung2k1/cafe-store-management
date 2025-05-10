@@ -8,7 +8,7 @@
 ![C++](https://img.shields.io/badge/C%2B%2B-blue?style=for-the-badge&logo=c++&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-blue?style=for-the-badge&logo=MYSQL&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-green?style=for-the-badge&logo=spring-boot&logoColor=white)
-![Kotlin](https://img.shields.io/badge/kotlin-%23ER8B41.svg?style=for-the-badge&logo=kotlin&logoColor=white)
+![Android Studio](https://img.shields.io/badge/kotlin-%23ER8B41.svg?style=for-the-badge&logo=kotlin&logoColor=white)
 
 Cafe Store Management repository works as TPC client-server connection running on Docker environment.
 
