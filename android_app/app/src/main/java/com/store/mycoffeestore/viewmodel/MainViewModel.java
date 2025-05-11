@@ -1,23 +1,26 @@
 package com.store.mycoffeestore.viewmodel;
 
+import android.content.Context;
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-//import com.google.firebase.database.DataSnapshot;
-//import com.google.firebase.database.DatabaseError;
-//import com.google.firebase.database.FirebaseDatabase;
-//import com.google.firebase.database.ValueEventListener;
-
+import com.store.mycoffeestore.api.ApiClient;
+import com.store.mycoffeestore.api.ApiService;
 import com.store.mycoffeestore.model.CategoryModel;
 import com.store.mycoffeestore.model.ItemsModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainViewModel extends ViewModel {
-
-//    private final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 
     private final MutableLiveData<List<CategoryModel>> _category = new MutableLiveData<>();
     private final MutableLiveData<List<ItemsModel>> _popular = new MutableLiveData<>();
@@ -34,114 +37,100 @@ public class MainViewModel extends ViewModel {
     public LiveData<List<ItemsModel>> getOffer() {
         return _offer;
     }
-/*
-    public void loadCategory() {
-        firebaseDatabase.getReference("Category").addValueEventListener(new ValueEventListener() {
+
+    public void loadCategory(Context context) {
+        ApiService api = ApiClient.getSecuredApiService(context);
+        api.getProductCategories().enqueue(new Callback<List<String>>() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                List<CategoryModel> lists = new ArrayList<>();
-                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                    CategoryModel list = childSnapshot.getValue(CategoryModel.class);
-                    if (list != null) {
-                        lists.add(list);
+            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<CategoryModel> categories = new ArrayList<>();
+                    int id = 1;
+                    for (String name : response.body()) {
+                        categories.add(new CategoryModel(name, id++));
                     }
+                    _category.setValue(categories);
                 }
-                _category.setValue(lists);
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-                // Handle error if needed
+            public void onFailure(Call<List<String>> call, Throwable t) {
+                Log.e("MainViewModel", "loadCategory error: " + t.getMessage());
             }
         });
     }
 
-    public void loadPopular() {
-        firebaseDatabase.getReference("Items").addValueEventListener(new ValueEventListener() {
+    public void loadPopular(Context context) {
+        ApiService api = ApiClient.getSecuredApiService(context);
+        api.getProductsByType("Popular").enqueue(new Callback<List<Map<String, Object>>>() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                List<ItemsModel> lists = new ArrayList<>();
-                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                    ItemsModel list = childSnapshot.getValue(ItemsModel.class);
-                    if (list != null) {
-                        lists.add(list);
-                    }
+            public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<ItemsModel> items = convertToItemsModel(response.body());
+                    _popular.setValue(items);
                 }
-                _popular.setValue(lists);
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-                // Handle error if needed
+            public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
+                Log.e("MainViewModel", "loadPopular error: " + t.getMessage());
             }
         });
     }
 
-    public void loadOffer() {
-        firebaseDatabase.getReference("Offers").addValueEventListener(new ValueEventListener() {
+    public void loadOffer(Context context) {
+        ApiService api = ApiClient.getSecuredApiService(context);
+        api.getProductsByType("Offer").enqueue(new Callback<List<Map<String, Object>>>() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                List<ItemsModel> lists = new ArrayList<>();
-                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                    ItemsModel list = childSnapshot.getValue(ItemsModel.class);
-                    if (list != null) {
-                        lists.add(list);
-                    }
+            public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<ItemsModel> items = convertToItemsModel(response.body());
+                    _offer.setValue(items);
                 }
-                _offer.setValue(lists);
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-                // Handle error if needed
+            public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
+                Log.e("MainViewModel", "loadOffer error: " + t.getMessage());
             }
         });
     }
-*/
-    // Simulating data for Categories
-    public void loadCategory() {
-        List<CategoryModel> categories = new ArrayList<>();
-        categories.add(new CategoryModel("Coffee", 1));
-        categories.add(new CategoryModel("Tea", 2));
-        categories.add(new CategoryModel("Smoothies", 3));
-        categories.add(new CategoryModel("Bakery", 4));
 
-        _category.setValue(categories);
-    }
+    private List<ItemsModel> convertToItemsModel(List<Map<String, Object>> data) {
+        List<ItemsModel> items = new ArrayList<>();
+        for (Map<String, Object> map : data) {
+            ItemsModel item = new ItemsModel();
 
-    // Simulating data for Popular Items
-    public void loadPopular() {
-        List<ItemsModel> popularItems = new ArrayList<>();
+            item.setTitle((String) map.get("productName"));
+            item.setDescription((String) map.get("productDescription"));
 
-        // Adding sample popular items
-        ArrayList<String> picUrl = new ArrayList<>();
-        picUrl.add("https://example.com/coffee_image_1.jpg");
-        popularItems.add(new ItemsModel("Latte", "A smooth coffee with steamed milk", picUrl, 4.99, 4.5f, 0, "Special"));
+            Object priceObj = map.get("productPrice");
+            item.setPrice(priceObj instanceof Number ? ((Number) priceObj).doubleValue() : 0.0);
 
-        picUrl = new ArrayList<>();
-        picUrl.add("https://example.com/coffee_image_2.jpg");
-        popularItems.add(new ItemsModel("Cappuccino", "Espresso with steamed milk and foam", picUrl, 3.99, 4.7f, 0, "Classic"));
+            Object ratingObj = map.get("rating");
+            if (ratingObj instanceof Map) {
+                Map<String, Object> ratingMap = (Map<String, Object>) ratingObj;
+                Object rate = ratingMap.get("rate");
+                if (rate instanceof Number) {
+                    item.setRating(((Number) rate).floatValue());
+                } else {
+                    item.setRating(0f);
+                }
+            } else {
+                item.setRating(0f);
+            }
 
-        picUrl = new ArrayList<>();
-        picUrl.add("https://example.com/coffee_image_3.jpg");
-        popularItems.add(new ItemsModel("Espresso", "Strong black coffee", picUrl, 2.99, 4.8f, 0, "Bold"));
+            item.setExtra((String) map.getOrDefault("productModel", ""));
+            item.setNumberInCart(0);
 
-        _popular.setValue(popularItems);
-    }
+            List<String> picList = new ArrayList<>();
+            if (map.containsKey("imageUrl")) {
+                picList.add((String) map.get("imageUrl"));
+            }
+            item.setPicUrl(new ArrayList<>(picList));
 
-    // Simulating data for Offers
-    public void loadOffer() {
-        List<ItemsModel> offers = new ArrayList<>();
-
-        // Adding sample offers
-        ArrayList<String> picUrl = new ArrayList<>();
-        picUrl.add("https://example.com/offer_image_1.jpg");
-        offers.add(new ItemsModel("Summer Special", "Get a 10% discount on all drinks", picUrl, 4.49, 4.2f, 0, "Offer"));
-
-        picUrl = new ArrayList<>();
-        picUrl.add("https://example.com/offer_image_2.jpg");
-        offers.add(new ItemsModel("Buy One Get One Free", "On selected items", picUrl, 5.99, 4.0f, 0, "BOGO"));
-
-        _offer.setValue(offers);
+            items.add(item);
+        }
+        return items;
     }
 }

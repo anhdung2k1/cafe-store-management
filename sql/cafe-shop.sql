@@ -1,504 +1,267 @@
-CREATE TABLE users(
-    user_id BIGINT NOT NULL AUTO_INCREMENT, 
-    address VARCHAR(255), 
-    birth_day VARCHAR(255), 
-    gender VARCHAR(255), 
-    user_name VARCHAR(255) NOT NULL,
-    image_url VARCHAR(255), 
-    create_at DATETIME(6), 
-    update_at DATETIME(6), 
-    PRIMARY KEY (user_id)
+-- USERS TABLE
+CREATE TABLE users (
+    user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_name VARCHAR(255) NOT NULL UNIQUE,
+    address VARCHAR(255),
+    birth_day VARCHAR(255),
+    gender VARCHAR(50),
+    image_url VARCHAR(255),
+    create_at DATETIME(6),
+    update_at DATETIME(6)
 );
 
-CREATE TABLE roles(
-    role_id BIGINT NOT NULL AUTO_INCREMENT,
+-- ROLES TABLE
+CREATE TABLE roles (
+    role_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     role_name VARCHAR(255) NOT NULL,
     role_description VARCHAR(255),
     create_at DATETIME(6),
-    update_at DATETIME(6),
-    PRIMARY KEY (role_id)
+    update_at DATETIME(6)
 );
 
-CREATE TABLE accounts(
-    acc_id BIGINT NOT NULL AUTO_INCREMENT,
-    role_id BIGINT NOT NULL,
+-- PERMISSIONS
+CREATE TABLE permission (
+    per_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    per_module VARCHAR(255),
+    per_name VARCHAR(255),
+    create_at DATETIME(6),
+    update_at DATETIME(6)
+);
+
+-- ROLES-PERMISSIONS JOIN
+CREATE TABLE roles_permissions (
+    role_id BIGINT,
+    per_id BIGINT,
+    PRIMARY KEY (role_id, per_id),
+    FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE,
+    FOREIGN KEY (per_id) REFERENCES permission(per_id) ON DELETE CASCADE
+);
+
+-- ACCOUNTS
+CREATE TABLE accounts (
+    acc_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    role_id BIGINT,
+    user_id BIGINT,
     user_name VARCHAR(255) NOT NULL,
     hash_pass VARCHAR(255) NOT NULL,
     create_at DATETIME(6),
     update_at DATETIME(6),
-    user_id BIGINT NOT NULL,
-    PRIMARY KEY (acc_id),
     FOREIGN KEY (role_id) REFERENCES roles(role_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
-CREATE TABLE permission(
-    per_id BIGINT NOT NULL AUTO_INCREMENT,
-    per_module VARCHAR(255) NOT NULL,
-    per_name VARCHAR(255) NOT NULL,
-    create_at DATETIME(6), 
-    update_at DATETIME(6), 
-    PRIMARY KEY (per_id)
-);
-
-CREATE TABLE roles_permissions(
-    role_id BIGINT NOT NULL,
-    per_id BIGINT NOT NULL,
-    PRIMARY KEY (role_id, per_id)
-);
-
-CREATE TABLE carts(
-    cart_id BIGINT NOT NULL AUTO_INCREMENT,
+-- CARTS
+CREATE TABLE carts (
+    cart_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
     cart_date DATE,
-    PRIMARY KEY (cart_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE TABLE wishlist(
-    wishlist_id BIGINT NOT NULL AUTO_INCREMENT,
+-- WISHLIST
+CREATE TABLE wishlist (
+    wishlist_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
-    PRIMARY KEY (wishlist_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE TABLE rating(
-    rating_id BIGINT NOT NULL AUTO_INCREMENT,
+-- RATING
+CREATE TABLE rating (
+    rating_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     rating_count INT NOT NULL,
-    rating_rate DOUBLE(10, 2) NOT NULL,
-    PRIMARY KEY (rating_id)
+    rating_rate DOUBLE(10, 2) NOT NULL
 );
 
-CREATE TABLE product(
-    product_id BIGINT NOT NULL AUTO_INCREMENT,
+-- PRODUCT
+CREATE TABLE product (
+    product_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     product_name VARCHAR(255) NOT NULL,
-    product_model VARCHAR(255) NOT NULL,
-    product_type VARCHAR(255) NOT NULL,
+    product_model VARCHAR(255),
+    product_type VARCHAR(255),
     product_quant INT NOT NULL,
     product_price DOUBLE(10, 2) NOT NULL,
     product_desc VARCHAR(255),
-    cart_id BIGINT,
     image_url VARCHAR(255),
     rating_id BIGINT,
     wishlist_id BIGINT,
-    create_at DATETIME(6), 
-    update_at DATETIME(6), 
-    PRIMARY KEY (product_id),
+    cart_id BIGINT,
+    create_at DATETIME(6),
+    update_at DATETIME(6),
     FOREIGN KEY (rating_id) REFERENCES rating(rating_id),
-    FOREIGN KEY (wishlist_id) REFERENCES wishlist(wishlist_id)
+    FOREIGN KEY (wishlist_id) REFERENCES wishlist(wishlist_id),
+    FOREIGN KEY (cart_id) REFERENCES carts(cart_id)
 );
 
-CREATE TABLE payment(
-    pay_id BIGINT NOT NULL AUTO_INCREMENT,
-    pay_desc VARCHAR(255),
+-- PAYMENT
+CREATE TABLE payment (
+    pay_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     pay_method VARCHAR(255) NOT NULL,
+    pay_desc VARCHAR(255),
     image_url VARCHAR(255),
-    create_at DATETIME(6), 
-    update_at DATETIME(6), 
-    PRIMARY KEY (pay_id)
+    create_at DATETIME(6),
+    update_at DATETIME(6)
 );
 
-
-CREATE TABLE user_payment(
-    pay_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
-    trans_id BIGINT NOT NULL,
-    PRIMARY KEY (pay_id, user_id, trans_id)
-);
-
-CREATE TABLE transactions(
-    trans_id BIGINT NOT NULL AUTO_INCREMENT,
-    trans_type VARCHAR(255) NOT NULL,
-    shipping_address VARCHAR(255) NOT NULL,
-    billing_payment DOUBLE(10, 2) NOT NULL,
-    pay_id BIGINT NOT NULL,
-    create_at DATETIME(6), 
-    update_at DATETIME(6), 
-    PRIMARY KEY (trans_id),
+-- TRANSACTIONS
+CREATE TABLE transactions (
+    trans_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    trans_type VARCHAR(255),
+    shipping_address VARCHAR(255),
+    billing_payment DOUBLE(10, 2),
+    pay_id BIGINT,
+    create_at DATETIME(6),
+    update_at DATETIME(6),
     FOREIGN KEY (pay_id) REFERENCES payment(pay_id)
 );
 
-CREATE TABLE orders(
-    order_id BIGINT NOT NULL AUTO_INCREMENT,
-    user_id BIGINT NOT NULL,
-    trans_id BIGINT NOT NULL,
-    order_date VARCHAR(255) NOT NULL,
-    order_status VARCHAR(255) NOT NULL,
-    total_amount DOUBLE(10, 2) NOT NULL,
-    create_at DATETIME(6),
-    update_at DATETIME(6),
-    PRIMARY KEY (order_id),
+-- USER-PAYMENT
+CREATE TABLE user_payment (
+    pay_id BIGINT,
+    user_id BIGINT,
+    trans_id BIGINT,
+    PRIMARY KEY (pay_id, user_id, trans_id),
+    FOREIGN KEY (pay_id) REFERENCES payment(pay_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (trans_id) REFERENCES transactions(trans_id)
 );
 
-INSERT INTO rating(rating_count, rating_rate) VALUES
-(100, 4.5),
-(150, 4.8),
-(120, 4.3),
-(200, 4.7),
-(90, 4.2),
-(180, 4.6),
-(110, 4.4),
-(170, 4.9),
-(130, 4.1),
-(160, 4.5),
-(140, 4.7),
-(210, 4.8),
-(95, 4.3),
-(185, 4.6),
-(115, 4.4),
-(125, 4.9),
-(155, 4.2),
-(165, 4.7),
-(145, 4.5),
-(175, 4.8),
-(105, 4.6),
-(195, 4.3),
-(135, 4.9),
-(145, 4.4),
-(185, 4.2),
-(155, 4.7),
-(165, 4.5),
-(135, 4.8),
-(175, 4.6),
-(115, 4.3),
-(195, 4.7),
-(105, 4.9),
-(180, 4.2),
-(140, 4.5),
-(160, 4.6),
-(130, 4.8),
-(170, 4.3),
-(110, 4.7),
-(210, 4.9),
-(120, 4.4),
-(150, 4.5),
-(100, 4.8),
-(185, 4.6),
-(155, 4.3),
-(165, 4.7),
-(135, 4.2),
-(175, 4.9),
-(105, 4.4),
-(195, 4.1),
-(115, 4.6),
-(180, 4.7),
-(140, 4.5),
-(160, 4.9),
-(130, 4.3),
-(170, 4.8),
-(110, 4.2),
-(210, 4.5),
-(120, 4.7),
-(150, 4.6),
-(100, 4.4),
-(185, 4.3),
-(155, 4.7),
-(165, 4.5),
-(135, 4.8),
-(175, 4.6),
-(105, 4.9),
-(195, 4.2),
-(115, 4.7),
-(180, 4.5),
-(140, 4.3),
-(160, 4.8),
-(130, 4.6),
-(170, 4.4),
-(110, 4.5),
-(210, 4.7),
-(120, 4.9),
-(150, 4.2),
-(100, 4.6),
-(185, 4.5),
-(155, 4.8),
-(165, 4.1),
-(135, 4.4),
-(175, 4.7),
-(105, 4.3),
-(195, 4.6),
-(115, 4.9),
-(180, 4.2),
-(140, 4.5),
-(160, 4.7),
-(130, 4.3),
-(170, 4.8),
-(110, 4.6),
-(210, 4.4),
-(120, 4.9),
-(150, 4.5),
-(134, 2.9),
-(123, 3.5);
+-- ORDERS
+CREATE TABLE orders (
+    order_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT,
+    trans_id BIGINT,
+    order_date VARCHAR(255),
+    order_status VARCHAR(255),
+    total_amount DOUBLE(10, 2),
+    create_at DATETIME(6),
+    update_at DATETIME(6),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (trans_id) REFERENCES transactions(trans_id)
+);
 
+-- 1. ROLES
+INSERT INTO roles(role_name, role_description, create_at, update_at)
+VALUES 
+('ADMIN', 'Full access to system', NOW(), NOW()),
+('USER', 'Standard user role', NOW(), NOW());
 
-INSERT INTO product(product_name, product_model, product_type, product_quant, product_price, product_desc, cart_id, image_url, rating_id, create_at, update_at) VALUES
-("iPhone 15", "Apple","iPhone", 21, 1500 , "Sample Desc", 1, "https://mobile-bucket.s3.amazonaws.com/mobile_images/iphone.jpg", 1, NOW(), NOW()),
-("iPhone 14", "Apple","iPhone", 50, 1300 , "Sample Desc", 1, "https://mobile-bucket.s3.amazonaws.com/mobile_images/iphone.jpg", 2, NOW(), NOW()),
-("iPhone 13", "Apple","iPhone", 100, 1000 , "Sample Desc", 1, "https://mobile-bucket.s3.amazonaws.com/mobile_images/iphone.jpg", 3, NOW(), NOW()),
-("Samsung Galaxy Note 10", "Samsung","Samsung", 22, 700 , "Sample Desc", 1, "https://mobile-bucket.s3.amazonaws.com/mobile_images/galaxy+note+10.jpg", 4, NOW(), NOW()),
-("Oppo A37", "Oppo","Oppo" , 12, 1100 , "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/oppo.jpg", 5, NOW(), NOW()),
-("Xiaomi Redmi Note 8", "Xiaomi","Xiaomi", 21, 1000 , "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/xiaomi.jpg", 6, NOW(), NOW()),
-("Samsung Galaxy S20", "Samsung","Samsung", 30, 2000 , "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/galaxy+note+10.jpg", 7, NOW(), NOW()),
-("Google Pixel 6", "Google","Google", 40, 1200 , "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/google+pixels.jpg", 8, NOW(), NOW()),
-("OnePlus 9 Pro", "OnePlus","OnePlus" ,10, 1300 , "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/OnePlus+9+Pro.jpg", 9, NOW(), NOW()),
-("Huawei P40", "Huawei","Huawei", 20, 1400 , "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/Huawei+P40.jpg", 10, NOW(), NOW()),
-("Sony Xperia 5 III", "Sony","Sony", 18, 1600,  "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/Sony+Xperia+5+III.jpg", 11, NOW(), NOW()),
-("LG Velvet", "LG","LG", 212, 1000 , "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/LG+Velvet.jpg", 12, NOW(), NOW()),
-("Nokia 9 PureView", "Nokia","Nokia", 212, 1000 , "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/nokia+pureview.jpg", 13, NOW(), NOW()),
-("Motorola Moto G Power", "Motorola","Motorola", 212, 1000 , "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/Motorola.jpg", 14, NOW(), NOW()),
-("ASUS ROG Phone 5", "ASUS","ASUS", 212, 1000 , "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/ASUS+ROG+PHONE+5.jpg", 15, NOW(), NOW()),
-("BlackBerry Key2", "BlackBerry","BlackBerry", 212, 1000 , "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/Blackberry+Key2.jpg", 16, NOW(), NOW()),
-("Lenovo Legion Phone Duel 2", "Lenovo","Lenovo", 212, 1000 , "Sample Desc", 2, "https://mobile-bucket.s3.amazonaws.com/mobile_images/Lenovo+Legion+Phone+Duel.jpg", 17, NOW(), NOW()),
-("Vivo X60 Pro", "Vivo","Vivo", 212, 1000 , "Sample Desc", 3, "https://mobile-bucket.s3.amazonaws.com/mobile_images/Vivo.jpg", 18, NOW(), NOW()),
-("Realme GT", "Realme","Realme", 212, 1000 , "Sample Desc", 3, "https://mobile-bucket.s3.amazonaws.com/mobile_images/Realme+GT.jpg", 19, NOW(), NOW()),
-("Xiaomi Mi 11 Ultra", "Xiaomi","Xiaomi", 212, 1000 , "Sample Desc", 3, "https://mobile-bucket.s3.amazonaws.com/mobile_images/xiaomi.jpg", 20, NOW(), NOW());
+-- 2. PERMISSIONS
+INSERT INTO permission(per_module, per_name, create_at, update_at)
+VALUES 
+('PRODUCT', 'READ', NOW(), NOW()),
+('PRODUCT', 'CREATE', NOW(), NOW()),
+('PRODUCT', 'UPDATE', NOW(), NOW()),
+('PRODUCT', 'DELETE', NOW(), NOW()),
+('ORDER', 'READ', NOW(), NOW()),
+('ORDER', 'CREATE', NOW(), NOW()),
+('ORDER', 'UPDATE', NOW(), NOW()),
+('ORDER', 'DELETE', NOW(), NOW()),
+('USER', 'MANAGE', NOW(), NOW()),
+('SYSTEM', 'ACCESS', NOW(), NOW());
 
+-- 3. ROLES_PERMISSIONS
+INSERT INTO roles_permissions(role_id, per_id)
+VALUES 
+(1,1),(1,2),(1,3),(1,4),
+(1,5),(1,6),(1,7),(1,8),
+(1,9),(1,10);
 
-INSERT INTO users(address, birth_day, gender, user_name, image_url, create_at, update_at) VALUES
-("District 3, Ho Chi Minh City", "1998-05-20", "Male", "trungtran1",  "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg", NOW(), NOW()),
-("District 5, Ho Chi Minh City", "1992-10-21", "Female", "nhuquynh2110", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("District 7, Ho Chi Minh City", "1999-09-11", "Male", "anhdung1109", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("District 10, Ho Chi Minh City", "2003-02-05", "Female", "tuyetnhi0502", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("District 12, Ho Chi Minh City", "2003-07-22", "Female", "trieuan123", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("District 1, Ho Chi Minh City", "2003-12-08", "Female", "khanhlinh11", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("District 2, Ho Chi Minh City", "1995-08-17", "Male", "vietanh1708", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("District 4, Ho Chi Minh City", "1990-03-14", "Male", "ducminh1403",  "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg", NOW(), NOW()),
-("District 6, Ho Chi Minh City", "1987-06-29", "Female", "thutrang296", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("District 8, Ho Chi Minh City", "1993-09-03", "Female", "hanhphuc0309", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("District 9, Ho Chi Minh City", "1985-12-12", "Male", "huyhoang1212", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("District 11, Ho Chi Minh City", "1997-04-26", "Male", "namson2604", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("Binh Tan District, Ho Chi Minh City", "1994-11-09", "Female", "ngocmai0911", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("Binh Thanh District, Ho Chi Minh City", "1988-02-14", "Male", "thanhcong1402", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("Tan Binh District, Ho Chi Minh City", "1991-07-31", "Female", "maihoa3107", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("Tan Phu District, Ho Chi Minh City", "1996-10-18", "Male", "dinhquan1810", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("Phu Nhuan District, Ho Chi Minh City", "1998-03-25", "Female", "thuytrang2503", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("Go Vap District, Ho Chi Minh City", "1990-06-01", "Male", "tienquan0106", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW()),
-("Thu Duc City, Ho Chi Minh City", "1989-09-15", "Male", "vanduc1509", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg", NOW(), NOW()),
-("Can Gio District, Ho Chi Minh City", "1995-12-23", "Female", "hoangyen2312", "https://mobile-bucket.s3.amazonaws.com/mobile_images/avatar.jpg",  NOW(), NOW());
+-- 4. USERS
+INSERT INTO users(user_name, address, birth_day, gender, image_url, create_at, update_at)
+VALUES 
+('barista01', 'District 1, HCM', '1990-05-12', 'Male', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/barista_1.png', NOW(), NOW()),
+('barista02', 'District 2, HCM', '1992-07-20', 'Female', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/barista_2.png', NOW(), NOW()),
+('customer01', 'District 3, HCM', '1995-01-01', 'Male', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/customer_1.jpg', NOW(), NOW()),
+('customer02', 'District 4, HCM', '1989-03-14', 'Female', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/customer_2.jpg', NOW(), NOW()),
+('staff01', 'District 5, HCM', '1998-08-30', 'Male', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/staff_1.jpg', NOW(), NOW()),
+('staff02', 'District 6, HCM', '1991-04-18', 'Female', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/staff_2.jpg', NOW(), NOW()),
+('guest01', 'District 7, HCM', '2000-12-12', 'Male', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/guest_1.jpg', NOW(), NOW()),
+('guest02', 'District 8, HCM', '1994-10-05', 'Female', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/guest_2.jpg', NOW(), NOW()),
+('manager01', 'District 9, HCM', '1985-02-27', 'Male', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/manager_1.jpg', NOW(), NOW()),
+('admin01', 'District 10, HCM', '1980-06-06', 'Male', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/admin_1.jpg', NOW(), NOW());
 
+-- 5. ACCOUNTS
+INSERT INTO accounts(role_id, user_id, user_name, hash_pass, create_at, update_at) VALUES
+(1, 10, 'admin01', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 1, 'barista01', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 2, 'barista02', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 3, 'customer01', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 4, 'customer02', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 5, 'staff01', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 6, 'staff02', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 7, 'guest01', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 8, 'guest02', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 9, 'manager01', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW());
 
-INSERT INTO payment(pay_method, pay_desc, image_url, create_at, update_at) VALUES
-("Credit card", "A payment method that allows customers to pay using a credit card, providing convenience and security.", "https://mobile-bucket.s3.amazonaws.com/mobile_images/master_card.png" ,NOW(), NOW()),
-("Cash", "A traditional payment method where transactions are settled with physical currency.", "https://mobile-bucket.s3.amazonaws.com/mobile_images/cash.png" ,NOW(), NOW()),
-("MOMO", "A payment method that involves MOMO transfer of funds between bank accounts.", "https://mobile-bucket.s3.amazonaws.com/mobile_images/momo.png" ,NOW(), NOW()),
-("Paypal", "A payment method that deducts funds directly from the customer's bank account at the point of sale.", "https://mobile-bucket.s3.amazonaws.com/mobile_images/paypal.png" ,NOW(), NOW());
+-- 6. CARTS
+INSERT INTO carts(user_id, cart_date)
+VALUES 
+(1,NOW()), (2,NOW()), (3,NOW()), (4,NOW()), (5,NOW()),
+(6,NOW()), (7,NOW()), (8,NOW()), (9,NOW()), (10,NOW());
 
-INSERT INTO user_payment(pay_id, user_id, trans_id) VALUES
-(1, 2, 1),
-(2, 5, 2),
-(3, 5, 4),
-(4, 76, 56),
-(1, 49, 8),
-(2, 28, 10),
-(3, 14, 12),
-(4, 81, 20),
-(1, 66, 24),
-(2, 40, 22),
-(3, 57, 26),
-(4, 34, 32),
-(1, 24, 34),
-(1, 95, 33),
-(1, 72, 31),
-(1, 69, 35),
-(1, 52, 36),
-(1, 86, 38),
-(1, 19, 37),
-(2, 63, 40),
-(2, 83, 39),
-(2, 33, 41),
-(2, 80, 42),
-(2, 47, 43),
-(2, 13, 45),
-(2, 51, 47),
-(2, 82, 49),
-(2, 91, 46),
-(2, 8, 50),
-(3, 55, 51),
-(3, 65, 52),
-(3, 12, 53),
-(3, 74, 54),
-(3, 96, 57),
-(3, 41, 56),
-(3, 43, 58),
-(3, 31, 59),
-(3, 85, 70),
-(3, 90, 60),
-(4, 46, 61),
-(4, 29, 62),
-(4, 93, 63),
-(4, 17, 64),
-(4, 35, 65),
-(4, 11, 66),
-(4, 79, 67),
-(4, 88, 68),
-(4, 67, 69),
-(4, 26, 70),
-(1, 23, 71),
-(1, 70, 72),
-(1, 7, 73),
-(1, 48, 74),
-(1, 30, 75),
-(1, 59, 76),
-(1, 39, 77),
-(1, 44, 78),
-(1, 50, 79),
-(1, 15, 80),
-(1, 91, 81),
-(1, 62, 82),
-(1, 25, 83),
-(1, 68, 84),
-(1, 87, 85),
-(1, 84, 86),
-(1, 18, 87),
-(1, 22, 88),
-(1, 61, 89),
-(1, 16, 90),
-(1, 75, 91),
-(1, 71, 92),
-(1, 96, 93);
+-- 7. WISHLIST
+INSERT INTO wishlist(user_id)
+VALUES 
+(1),(2),(3),(4),(5),(6),(7),(8),(9),(10);
 
-INSERT INTO roles(role_name, role_description, create_at, update_at) VALUES 
-("ADMIN", "Add, delete, edit, update", NOW(), NOW()),
-("USER", "User has read and create permissions", NOW(), NOW());
+-- 8. RATING
+INSERT INTO rating(rating_count, rating_rate)
+VALUES 
+(100, 4.5),(90, 4.2),(85, 4.8),(70, 4.6),(95, 4.7),
+(110, 4.3),(130, 4.9),(60, 4.1),(75, 4.4),(80, 4.6);
 
+-- 9. PAYMENT
+INSERT INTO payment(pay_method, pay_desc, image_url, create_at, update_at) VALUES 
+('Credit Card', 'Pay with Visa or MasterCard', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Credit_card.png', NOW(), NOW()),
+('Cash', 'Pay with physical currency', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Cash.png', NOW(), NOW()),
+('PayPal', 'Online PayPal payment', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/paypal.png', NOW(), NOW()),
+('Bank Transfer', 'Transfer to bank account', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Bank_Transfer.png', NOW(), NOW());
 
+-- 10. TRANSACTIONS
 INSERT INTO transactions(trans_type, shipping_address, billing_payment, pay_id, create_at, update_at) VALUES 
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Refund', '654 Maple St, CityE, CountryY', 20.00, 2, NOW(), NOW()),
-('Purchase', '987 Birch St, CityF, CountryZ', 200.00, 1, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Refund', '654 Maple St, CityE, CountryY', 20.00, 2, NOW(), NOW()),
-('Purchase', '987 Birch St, CityF, CountryZ', 200.00, 1, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Refund', '654 Maple St, CityE, CountryY', 20.00, 2, NOW(), NOW()),
-('Purchase', '987 Birch St, CityF, CountryZ', 200.00, 1, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Refund', '654 Maple St, CityE, CountryY', 20.00, 2, NOW(), NOW()),
-('Purchase', '987 Birch St, CityF, CountryZ', 200.00, 1, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Refund', '654 Maple St, CityE, CountryY', 20.00, 2, NOW(), NOW()),
-('Purchase', '987 Birch St, CityF, CountryZ', 200.00, 1, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Refund', '654 Maple St, CityE, CountryY', 20.00, 2, NOW(), NOW()),
-('Purchase', '987 Birch St, CityF, CountryZ', 200.00, 1, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Refund', '654 Maple St, CityE, CountryY', 20.00, 2, NOW(), NOW()),
-('Purchase', '987 Birch St, CityF, CountryZ', 200.00, 1, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Refund', '654 Maple St, CityE, CountryY', 20.00, 2, NOW(), NOW()),
-('Purchase', '987 Birch St, CityF, CountryZ', 200.00, 1, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Refund', '654 Maple St, CityE, CountryY', 20.00, 2, NOW(), NOW()),
-('Purchase', '987 Birch St, CityF, CountryZ', 200.00, 1, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW()),
-('Refund', '654 Maple St, CityE, CountryY', 20.00, 2, NOW(), NOW()),
-('Purchase', '987 Birch St, CityF, CountryZ', 200.00, 1, NOW(), NOW()),
-('Sale', '123 Main St, CityA, CountryX', 50.00, 1, NOW(), NOW()),
-('Refund', '456 Elm St, CityB, CountryY', 30.00, 2, NOW(), NOW()),
-('Purchase', '789 Oak St, CityC, CountryZ', 100.00, 3, NOW(), NOW()),
-('Sale', '321 Pine St, CityD, CountryX', 75.00, 4, NOW(), NOW());
+('Purchase', '12 Pasteur St', 45.50, 1, NOW(), NOW()),
+('Refund', 'Tran Hung Dao St', 30.00, 2, NOW(), NOW()),
+('Sale', 'Le Loi St', 72.25, 3, NOW(), NOW()),
+('Purchase', 'Nguyen Hue St', 110.75, 4, NOW(), NOW()),
+('Sale', 'Dinh Tien Hoang St', 65.00, 1, NOW(), NOW()),
+('Refund', 'Hai Ba Trung St', 28.50, 2, NOW(), NOW()),
+('Purchase', 'CMT8 St', 95.00, 3, NOW(), NOW()),
+('Sale', 'Nguyen Thi Minh Khai St', 120.00, 4, NOW(), NOW()),
+('Purchase', 'Ly Tu Trong St', 70.00, 1, NOW(), NOW()),
+('Refund', 'Nguyen Van Cu St', 40.00, 2, NOW(), NOW());
 
+-- 11. USER_PAYMENT
+INSERT INTO user_payment(pay_id, user_id, trans_id) VALUES 
+(1, 5, 5),
+(2, 6, 6),
+(3, 7, 7),
+(4, 8, 8),
+(1, 9, 9),
+(2, 10, 10);
 
+-- 12. ORDERS
+INSERT INTO orders(user_id, trans_id, order_date, order_status, total_amount, create_at, update_at) VALUES 
+(1, 1, '2025-05-10', 'COMPLETED', 45.50, NOW(), NOW()),
+(2, 2, '2025-05-10', 'COMPLETED', 30.00, NOW(), NOW()),
+(3, 3, '2025-05-10', 'COMPLETED', 72.25, NOW(), NOW()),
+(4, 4, '2025-05-10', 'COMPLETED', 110.75, NOW(), NOW()),
+(5, 5, '2025-05-10', 'COMPLETED', 65.00, NOW(), NOW()),
+(6, 6, '2025-05-10', 'COMPLETED', 28.50, NOW(), NOW()),
+(7, 7, '2025-05-10', 'COMPLETED', 95.00, NOW(), NOW()),
+(8, 8, '2025-05-10', 'COMPLETED', 120.00, NOW(), NOW()),
+(9, 9, '2025-05-10', 'COMPLETED', 70.00, NOW(), NOW()),
+(10, 10, '2025-05-10', 'COMPLETED', 40.00, NOW(), NOW());
 
-INSERT INTO permission(per_module, per_name, create_at, update_at) VALUES 
-("INVENTORY;SALES;SETTING;MANAGE", "READ;CREATE;UPDATE;DELETE", NOW(), NOW()),
-("INVENTORY;SALES", "READ;CREATE", NOW(), NOW());
-
-
-INSERT INTO roles_permissions(role_id, per_id) VALUES 
-(1,1),
-(2,2);
-
-INSERT INTO accounts(role_id,user_name,hash_pass,create_at,update_at,user_id)
-VALUES (1,'trungtran1','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),2),
-    (2,'nhuquynh2110','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),1),
-    (2,'anhdung1109','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),3),
-    (2,'tuyetnhi0502','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),4),
-    (2,'trieuan123','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),5),
-    (2,'khanhlinh11','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),6),
-    (2,'vietanh1708','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),7),
-    (2,'ducminh1403','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),8),
-    (2,'thutrang296','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),9),
-    (2,'hanhphuc0309','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),10),
-    (2,'huyhoang1212','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),11),
-    (2,'namson2604','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),12),
-    (2,'ngocmai0911','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),13),
-    (2,'thanhcong1402','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),14),
-    (2,'maihoa3107','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),15),
-    (2,'dinhquan1810','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),16),
-    (2,'thuytrang2503','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),17),
-    (2,'tienquan0106','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),18),
-    (2,'vanduc1509','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),19),
-    (2,'hoangyen2312','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(),20),
-    (2,'quanminh0805','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly',NOW(),NOW(), 21),
-    (2,'thanhdat2008','$2a$10$eqRYyaESCp9hWFxHnnY9M.xmFnjN4txjdho/B3IK3ICQwUnAq5Sly', NOW(),NOW(),22);
-
-INSERT INTO carts(user_id, cart_date) VALUES
-(1, NOW()),(2, NOW()),(3, NOW()),(4, NOW());
+-- 13. PRODUCT
+INSERT INTO product(product_name, product_model, product_type, product_quant, product_price, product_desc, image_url, rating_id, create_at, update_at)
+VALUES 
+('Espresso', 'Cup', 'Popular', 100, 2.50, 'Strong black coffee', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Espresso.jpg', 1, NOW(), NOW()),
+('Latte', 'Tall', 'Offer', 120, 3.75, 'Espresso with milk', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Latte.jpg', 2, NOW(), NOW()),
+('Cappuccino', 'Medium', 'Popular', 90, 3.50, 'Foamy milk & espresso', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Cappuccino.jpg', 3, NOW(), NOW()),
+('Mocha', 'Large', 'Offer', 80, 4.00, 'Chocolate + espresso', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Mocha.jpg', 4, NOW(), NOW()),
+('Americano', 'Regular', 'Offer', 110, 2.80, 'Watered espresso', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Americano.jpg', 5, NOW(), NOW()),
+('Cold Brew', 'Bottle', 'Offer', 150, 3.20, 'Brewed cold', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Cold_Brew.jpg', 6, NOW(), NOW()),
+('Flat White', 'Tall', 'Popular', 75, 3.90, 'Smooth texture', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Flat_White.jpg', 7, NOW(), NOW()),
+('Macchiato', 'Small', 'Popular', 60, 3.30, 'Espresso w/ foam', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Macchiato.jpg', 8, NOW(), NOW()),
+('Irish Coffee', 'Glass', 'Offer', 40, 5.00, 'Whiskey + coffee', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Irish_Coffee.jpg', 9, NOW(), NOW()),
+('Affogato', 'Dessert', 'Offer', 50, 4.25, 'Ice cream + espresso', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Affogato.jpg', 10, NOW(), NOW());

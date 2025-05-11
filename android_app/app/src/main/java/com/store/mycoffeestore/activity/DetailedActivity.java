@@ -3,8 +3,10 @@ package com.store.mycoffeestore.activity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-
+import android.util.Log;
 import android.widget.*;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,23 +14,28 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
-
-
-
 import com.google.android.material.imageview.ShapeableImageView;
 import com.store.mycoffeestore.R;
 import com.store.mycoffeestore.adapter.SizeAdapter;
-import com.store.mycoffeestore.helper.ManagementCart;
+import com.store.mycoffeestore.api.ApiClient;
+import com.store.mycoffeestore.helper.SizeSelectListener;
+import com.store.mycoffeestore.helper.TokenManager;
 import com.store.mycoffeestore.model.ItemsModel;
+import com.store.mycoffeestore.model.Product;
 
 import java.util.ArrayList;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DetailedActivity extends AppCompatActivity {
 
     private ItemsModel item;
-    private ManagementCart managementCart;
+    private Long userId;
+    private String selectedSize = "1"; // default
 
-    // UI elements
     private ShapeableImageView shapeableImageView;
     private TextView titleTxt, descriptionTxt, priceTxt, numberItemTxt, plusCart, minusCart;
     private RatingBar ratingBar;
@@ -41,10 +48,10 @@ public class DetailedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed);
 
-        managementCart = new ManagementCart(this);
         initView();
         bundle();
         initSizeList();
+        fetchUserId();
     }
 
     private void initView() {
@@ -68,12 +75,17 @@ public class DetailedActivity extends AppCompatActivity {
         sizeList.add("3");
         sizeList.add("4");
 
-        SizeAdapter adapter = new SizeAdapter(this, sizeList);
-        rvSizeList.setAdapter(adapter);
+        SizeAdapter adapter = new SizeAdapter(this, sizeList, new SizeSelectListener() {
+            @Override
+            public void onSizeSelected(String size) {
+                selectedSize = size;
+            }
+        });
+
         rvSizeList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        rvSizeList.setAdapter(adapter);
 
         ArrayList<String> colorList = new ArrayList<>(item.getPicUrl());
-
         if (!colorList.isEmpty()) {
             Glide.with(this)
                     .load(colorList.get(0))
@@ -85,19 +97,14 @@ public class DetailedActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void bundle() {
         Intent intent = getIntent();
-        item = intent.getParcelableExtra("object");
+        item = intent.getParcelableExtra("object", ItemsModel.class);
 
         if (item != null) {
             titleTxt.setText(item.getTitle());
             descriptionTxt.setText(item.getDescription());
             priceTxt.setText("$" + item.getPrice());
-            ratingBar.setRating((float) item.getRating());
+            ratingBar.setRating(item.getRating());
             numberItemTxt.setText(String.valueOf(item.getNumberInCart()));
-
-            addToCart.setOnClickListener(v -> {
-                item.setNumberInCart(Integer.parseInt(numberItemTxt.getText().toString()));
-                managementCart.insertItems(item);
-            });
 
             ivBack.setOnClickListener(v -> finish());
 
@@ -115,6 +122,84 @@ public class DetailedActivity extends AppCompatActivity {
                     numberItemTxt.setText(String.valueOf(count));
                 }
             });
+
+            addToCart.setOnClickListener(v -> {
+                item.setNumberInCart(Integer.parseInt(numberItemTxt.getText().toString()));
+                addItemToCart();
+            });
         }
+    }
+
+    private void fetchUserId() {
+        TokenManager tokenManager = new TokenManager(this);
+        String userName = tokenManager.getUserNameFromToken();
+
+        if (userName == null) {
+            Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ApiClient.getSecuredApiService(this).getUserIdByUserName(userName)
+                .enqueue(new Callback<Map<String, Long>>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Map<String, Long>> call, @NonNull Response<Map<String, Long>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            userId = response.body().get("id");
+                        } else {
+                            Toast.makeText(DetailedActivity.this, "Cannot get userId", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<Map<String, Long>> call, @NonNull Throwable t) {
+                        Toast.makeText(DetailedActivity.this, "Failed to get userId", Toast.LENGTH_SHORT).show();
+                        Log.e("DetailedActivity", "userId error", t);
+                    }
+                });
+    }
+
+    private void addItemToCart() {
+        if (userId == null) {
+            Toast.makeText(this, "User ID not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Product product = getProduct();
+
+        ApiClient.getSecuredApiService(this)
+                .addToCart(userId, product)
+                .enqueue(new Callback<Map<String, Object>>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Map<String, Object>> call, @NonNull Response<Map<String, Object>> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(DetailedActivity.this, "Added to cart!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(DetailedActivity.this, "Failed to add", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<Map<String, Object>> call, @NonNull Throwable t) {
+                        Toast.makeText(DetailedActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                        Log.e("AddToCart", "Error: ", t);
+                    }
+                });
+    }
+
+    @NonNull
+    private Product getProduct() {
+        Product product = new Product();
+        product.setProductName(item.getTitle());
+        product.setProductModel(selectedSize);
+        product.setProductPrice(item.getPrice());
+        product.setProductQuantity(item.getNumberInCart());
+        product.setProductDescription(item.getDescription());
+        product.setProductType("Popular");
+
+        if (!item.getPicUrl().isEmpty()) {
+            product.setImageUrl(item.getPicUrl().get(0));
+        }
+
+        return product;
     }
 }
