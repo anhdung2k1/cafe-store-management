@@ -20,7 +20,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/** @noinspection ALL*/
 public class MainViewModel extends ViewModel {
 
     private final MutableLiveData<List<CategoryModel>> _category = new MutableLiveData<>();
@@ -97,15 +96,30 @@ public class MainViewModel extends ViewModel {
         });
     }
 
-    // Convert JSON maps from API into ItemsModel objects
     private List<ItemsModel> convertToItemsModel(List<Map<String, Object>> data) {
         List<ItemsModel> items = new ArrayList<>();
         for (Map<String, Object> map : data) {
             ItemsModel item = new ItemsModel();
+
             item.setTitle((String) map.get("productName"));
             item.setDescription((String) map.get("productDescription"));
-            item.setPrice((Double) map.get("productPrice"));
-            item.setRating(((Number) map.getOrDefault("rating", 0)).floatValue());
+
+            Object priceObj = map.get("productPrice");
+            item.setPrice(priceObj instanceof Number ? ((Number) priceObj).doubleValue() : 0.0);
+
+            Object ratingObj = map.get("rating");
+            if (ratingObj instanceof Map) {
+                Map<String, Object> ratingMap = (Map<String, Object>) ratingObj;
+                Object rate = ratingMap.get("rate");
+                if (rate instanceof Number) {
+                    item.setRating(((Number) rate).floatValue());
+                } else {
+                    item.setRating(0f);
+                }
+            } else {
+                item.setRating(0f);
+            }
+
             item.setExtra((String) map.getOrDefault("productModel", ""));
             item.setNumberInCart(0);
 
@@ -114,6 +128,7 @@ public class MainViewModel extends ViewModel {
                 picList.add((String) map.get("imageUrl"));
             }
             item.setPicUrl(new ArrayList<>(picList));
+
             items.add(item);
         }
         return items;

@@ -132,7 +132,7 @@ public class DetailedActivity extends AppCompatActivity {
 
     private void fetchUserId() {
         TokenManager tokenManager = new TokenManager(this);
-        String userName = tokenManager.getUserName();
+        String userName = tokenManager.getUserNameFromToken();
 
         if (userName == null) {
             Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();

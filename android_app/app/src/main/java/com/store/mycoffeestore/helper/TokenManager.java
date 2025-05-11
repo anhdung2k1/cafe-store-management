@@ -2,13 +2,16 @@ package com.store.mycoffeestore.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Base64;
+import android.util.Log;
+
+import org.json.JSONObject;
 
 // Helper class to store and retrieve JWT token and username
 public class TokenManager {
 
     private static final String PREF_NAME = "my_app_prefs";
     private static final String TOKEN_KEY = "auth_token";
-    private static final String USERNAME_KEY = "user_name";
 
     private final SharedPreferences sharedPreferences;
 
@@ -25,22 +28,27 @@ public class TokenManager {
     public String getToken() {
         return sharedPreferences.getString(TOKEN_KEY, null);
     }
-
-    // Save username
-    public void saveUserName(String userName) {
-        sharedPreferences.edit().putString(USERNAME_KEY, userName).apply();
-    }
-
-    // Get username
-    public String getUserName() {
-        return sharedPreferences.getString(USERNAME_KEY, null);
-    }
-
     // Clear token and username (logout)
     public void clearSession() {
         sharedPreferences.edit()
                 .remove(TOKEN_KEY)
-                .remove(USERNAME_KEY)
                 .apply();
+    }
+
+    public String getUserNameFromToken() {
+        try {
+            String token = getToken();
+            if (token == null || token.isEmpty()) return null;
+
+            String[] parts = token.split("\\.");
+            if (parts.length != 3) return null;
+
+            String payload = new String(Base64.decode(parts[1], Base64.URL_SAFE));
+            JSONObject json = new JSONObject(payload);
+            return json.optString("sub", null);
+        } catch (Exception e) {
+            Log.e("TokenManager", "Failed to extract sub from token", e);
+            return null;
+        }
     }
 }

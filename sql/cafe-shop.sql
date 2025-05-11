@@ -139,25 +139,13 @@ CREATE TABLE orders (
     FOREIGN KEY (trans_id) REFERENCES transactions(trans_id)
 );
 
-INSERT INTO users(user_name, address, birth_day, gender, image_url, create_at, update_at)
-VALUES 
-('barista01', 'District 1, HCM', '1990-05-12', 'Male', 'https://example.com/avatar1.jpg', NOW(), NOW()),
-('barista02', 'District 2, HCM', '1992-07-20', 'Female', 'https://example.com/avatar2.jpg', NOW(), NOW()),
-('customer01', 'District 3, HCM', '1995-01-01', 'Male', 'https://example.com/avatar3.jpg', NOW(), NOW()),
-('customer02', 'District 4, HCM', '1989-03-14', 'Female', 'https://example.com/avatar4.jpg', NOW(), NOW()),
-('staff01', 'District 5, HCM', '1998-08-30', 'Male', 'https://example.com/avatar5.jpg', NOW(), NOW()),
-('staff02', 'District 6, HCM', '1991-04-18', 'Female', 'https://example.com/avatar6.jpg', NOW(), NOW()),
-('guest01', 'District 7, HCM', '2000-12-12', 'Male', 'https://example.com/avatar7.jpg', NOW(), NOW()),
-('guest02', 'District 8, HCM', '1994-10-05', 'Female', 'https://example.com/avatar8.jpg', NOW(), NOW()),
-('manager01', 'District 9, HCM', '1985-02-27', 'Male', 'https://example.com/avatar9.jpg', NOW(), NOW()),
-('admin01', 'District 10, HCM', '1980-06-06', 'Male', 'https://example.com/avatar10.jpg', NOW(), NOW());
-
+-- 1. ROLES
 INSERT INTO roles(role_name, role_description, create_at, update_at)
 VALUES 
 ('ADMIN', 'Full access to system', NOW(), NOW()),
 ('USER', 'Standard user role', NOW(), NOW());
 
-
+-- 2. PERMISSIONS
 INSERT INTO permission(per_module, per_name, create_at, update_at)
 VALUES 
 ('PRODUCT', 'READ', NOW(), NOW()),
@@ -171,72 +159,87 @@ VALUES
 ('USER', 'MANAGE', NOW(), NOW()),
 ('SYSTEM', 'ACCESS', NOW(), NOW());
 
+-- 3. ROLES_PERMISSIONS
 INSERT INTO roles_permissions(role_id, per_id)
 VALUES 
 (1,1),(1,2),(1,3),(1,4),
 (1,5),(1,6),(1,7),(1,8),
 (1,9),(1,10);
 
+-- 4. USERS
+INSERT INTO users(user_name, address, birth_day, gender, image_url, create_at, update_at)
+VALUES 
+('barista01', 'District 1, HCM', '1990-05-12', 'Male', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/barista_1.png', NOW(), NOW()),
+('barista02', 'District 2, HCM', '1992-07-20', 'Female', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/barista_2.png', NOW(), NOW()),
+('customer01', 'District 3, HCM', '1995-01-01', 'Male', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/customer_1.jpg', NOW(), NOW()),
+('customer02', 'District 4, HCM', '1989-03-14', 'Female', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/customer_2.jpg', NOW(), NOW()),
+('staff01', 'District 5, HCM', '1998-08-30', 'Male', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/staff_1.jpg', NOW(), NOW()),
+('staff02', 'District 6, HCM', '1991-04-18', 'Female', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/staff_2.jpg', NOW(), NOW()),
+('guest01', 'District 7, HCM', '2000-12-12', 'Male', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/guest_1.jpg', NOW(), NOW()),
+('guest02', 'District 8, HCM', '1994-10-05', 'Female', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/guest_2.jpg', NOW(), NOW()),
+('manager01', 'District 9, HCM', '1985-02-27', 'Male', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/manager_1.jpg', NOW(), NOW()),
+('admin01', 'District 10, HCM', '1980-06-06', 'Male', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/admin_1.jpg', NOW(), NOW());
+
+-- 5. ACCOUNTS
+INSERT INTO accounts(role_id, user_id, user_name, hash_pass, create_at, update_at) VALUES
+(1, 10, 'admin01', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 1, 'barista01', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 2, 'barista02', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 3, 'customer01', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 4, 'customer02', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 5, 'staff01', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 6, 'staff02', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 7, 'guest01', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 8, 'guest02', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW()),
+(2, 9, 'manager01', '$2a$10$4GIKc/xjK8zNqsDvBsJY1OePPeium.J3NAhl64O3EQDQ3FKTfl5uq', NOW(), NOW());
+
+-- 6. CARTS
 INSERT INTO carts(user_id, cart_date)
 VALUES 
 (1,NOW()), (2,NOW()), (3,NOW()), (4,NOW()), (5,NOW()),
 (6,NOW()), (7,NOW()), (8,NOW()), (9,NOW()), (10,NOW());
 
+-- 7. WISHLIST
 INSERT INTO wishlist(user_id)
 VALUES 
 (1),(2),(3),(4),(5),(6),(7),(8),(9),(10);
 
+-- 8. RATING
 INSERT INTO rating(rating_count, rating_rate)
 VALUES 
 (100, 4.5),(90, 4.2),(85, 4.8),(70, 4.6),(95, 4.7),
 (110, 4.3),(130, 4.9),(60, 4.1),(75, 4.4),(80, 4.6);
 
-INSERT INTO product(product_name, product_model, product_type, product_quant, product_price, product_desc, image_url, rating_id, create_at, update_at)
-VALUES 
-('Espresso', 'Cup', 'Coffee', 100, 2.50, 'Strong black coffee', 'https://example.com/espresso.jpg', 1, NOW(), NOW()),
-('Latte', 'Tall', 'Coffee', 120, 3.75, 'Espresso with milk', 'https://example.com/latte.jpg', 2, NOW(), NOW()),
-('Cappuccino', 'Medium', 'Coffee', 90, 3.50, 'Foamy milk & espresso', 'https://example.com/cappuccino.jpg', 3, NOW(), NOW()),
-('Mocha', 'Large', 'Coffee', 80, 4.00, 'Chocolate + espresso', 'https://example.com/mocha.jpg', 4, NOW(), NOW()),
-('Americano', 'Regular', 'Coffee', 110, 2.80, 'Watered espresso', 'https://example.com/americano.jpg', 5, NOW(), NOW()),
-('Cold Brew', 'Bottle', 'Coffee', 150, 3.20, 'Brewed cold', 'https://example.com/coldbrew.jpg', 6, NOW(), NOW()),
-('Flat White', 'Tall', 'Coffee', 75, 3.90, 'Smooth texture', 'https://example.com/flatwhite.jpg', 7, NOW(), NOW()),
-('Macchiato', 'Small', 'Coffee', 60, 3.30, 'Espresso w/ foam', 'https://example.com/macchiato.jpg', 8, NOW(), NOW()),
-('Irish Coffee', 'Glass', 'Coffee', 40, 5.00, 'Whiskey + coffee', 'https://example.com/irish.jpg', 9, NOW(), NOW()),
-('Affogato', 'Dessert', 'Coffee', 50, 4.25, 'Ice cream + espresso', 'https://example.com/affogato.jpg', 10, NOW(), NOW());
-
+-- 9. PAYMENT
 INSERT INTO payment(pay_method, pay_desc, image_url, create_at, update_at) VALUES 
-('Credit Card', 'Pay with Visa or MasterCard', 'https://example.com/payment1.png', NOW(), NOW()),
-('Cash', 'Pay with physical currency', 'https://example.com/payment2.png', NOW(), NOW()),
-('MOMO', 'Pay with MOMO wallet', 'https://example.com/payment3.png', NOW(), NOW()),
-('PayPal', 'Online PayPal payment', 'https://example.com/payment5.png', NOW(), NOW()),
-('Bank Transfer', 'Transfer to bank account', 'https://example.com/payment6.png', NOW(), NOW());
+('Credit Card', 'Pay with Visa or MasterCard', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Credit_card.png', NOW(), NOW()),
+('Cash', 'Pay with physical currency', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Cash.png', NOW(), NOW()),
+('PayPal', 'Online PayPal payment', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/paypal.png', NOW(), NOW()),
+('Bank Transfer', 'Transfer to bank account', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Bank_Transfer.png', NOW(), NOW());
 
-
+-- 10. TRANSACTIONS
 INSERT INTO transactions(trans_type, shipping_address, billing_payment, pay_id, create_at, update_at) VALUES 
-('Purchase', '12 Pasteur St, District 1', 45.50, 1, NOW(), NOW()),
-('Refund', '34 Tran Hung Dao, District 5', 30.00, 2, NOW(), NOW()),
-('Sale', '7 Le Loi, District 3', 72.25, 3, NOW(), NOW()),
-('Purchase', '99 Nguyen Hue, District 1', 110.75, 4, NOW(), NOW()),
-('Sale', '1 Dinh Tien Hoang, District 1', 65.00, 5, NOW(), NOW()),
-('Refund', '88 Hai Ba Trung, District 3', 28.50, 6, NOW(), NOW()),
-('Purchase', '56 Cach Mang Thang 8, District 10', 95.00, 7, NOW(), NOW()),
-('Sale', '42 Nguyen Thi Minh Khai, District 1', 120.00, 8, NOW(), NOW()),
-('Purchase', '25 Ly Tu Trong, District 1', 70.00, 9, NOW(), NOW()),
-('Refund', '33 Nguyen Van Cu, District 5', 40.00, 10, NOW(), NOW());
+('Purchase', '12 Pasteur St', 45.50, 1, NOW(), NOW()),
+('Refund', 'Tran Hung Dao St', 30.00, 2, NOW(), NOW()),
+('Sale', 'Le Loi St', 72.25, 3, NOW(), NOW()),
+('Purchase', 'Nguyen Hue St', 110.75, 4, NOW(), NOW()),
+('Sale', 'Dinh Tien Hoang St', 65.00, 1, NOW(), NOW()),
+('Refund', 'Hai Ba Trung St', 28.50, 2, NOW(), NOW()),
+('Purchase', 'CMT8 St', 95.00, 3, NOW(), NOW()),
+('Sale', 'Nguyen Thi Minh Khai St', 120.00, 4, NOW(), NOW()),
+('Purchase', 'Ly Tu Trong St', 70.00, 1, NOW(), NOW()),
+('Refund', 'Nguyen Van Cu St', 40.00, 2, NOW(), NOW());
 
-
+-- 11. USER_PAYMENT
 INSERT INTO user_payment(pay_id, user_id, trans_id) VALUES 
-(1, 1, 1),
-(2, 2, 2),
-(3, 3, 3),
-(4, 4, 4),
-(5, 5, 5),
-(6, 6, 6),
-(7, 7, 7),
-(8, 8, 8),
-(9, 9, 9),
-(10, 10, 10);
+(1, 5, 5),
+(2, 6, 6),
+(3, 7, 7),
+(4, 8, 8),
+(1, 9, 9),
+(2, 10, 10);
 
+-- 12. ORDERS
 INSERT INTO orders(user_id, trans_id, order_date, order_status, total_amount, create_at, update_at) VALUES 
 (1, 1, '2025-05-10', 'COMPLETED', 45.50, NOW(), NOW()),
 (2, 2, '2025-05-10', 'COMPLETED', 30.00, NOW(), NOW()),
@@ -248,3 +251,17 @@ INSERT INTO orders(user_id, trans_id, order_date, order_status, total_amount, cr
 (8, 8, '2025-05-10', 'COMPLETED', 120.00, NOW(), NOW()),
 (9, 9, '2025-05-10', 'COMPLETED', 70.00, NOW(), NOW()),
 (10, 10, '2025-05-10', 'COMPLETED', 40.00, NOW(), NOW());
+
+-- 13. PRODUCT
+INSERT INTO product(product_name, product_model, product_type, product_quant, product_price, product_desc, image_url, rating_id, create_at, update_at)
+VALUES 
+('Espresso', 'Cup', 'Popular', 100, 2.50, 'Strong black coffee', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Espresso.jpg', 1, NOW(), NOW()),
+('Latte', 'Tall', 'Offer', 120, 3.75, 'Espresso with milk', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Latte.jpg', 2, NOW(), NOW()),
+('Cappuccino', 'Medium', 'Popular', 90, 3.50, 'Foamy milk & espresso', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Cappuccino.jpg', 3, NOW(), NOW()),
+('Mocha', 'Large', 'Offer', 80, 4.00, 'Chocolate + espresso', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Mocha.jpg', 4, NOW(), NOW()),
+('Americano', 'Regular', 'Offer', 110, 2.80, 'Watered espresso', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Americano.jpg', 5, NOW(), NOW()),
+('Cold Brew', 'Bottle', 'Offer', 150, 3.20, 'Brewed cold', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Cold_Brew.jpg', 6, NOW(), NOW()),
+('Flat White', 'Tall', 'Popular', 75, 3.90, 'Smooth texture', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Flat_White.jpg', 7, NOW(), NOW()),
+('Macchiato', 'Small', 'Popular', 60, 3.30, 'Espresso w/ foam', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Macchiato.jpg', 8, NOW(), NOW()),
+('Irish Coffee', 'Glass', 'Offer', 40, 5.00, 'Whiskey + coffee', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Irish_Coffee.jpg', 9, NOW(), NOW()),
+('Affogato', 'Dessert', 'Offer', 50, 4.25, 'Ice cream + espresso', 'https://product-bucket-storage.s3.us-east-1.amazonaws.com/product_images/Affogato.jpg', 10, NOW(), NOW());
