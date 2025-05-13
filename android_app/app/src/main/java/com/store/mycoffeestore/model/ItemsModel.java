@@ -14,6 +14,7 @@ import java.util.ArrayList;
 @AllArgsConstructor
 public class ItemsModel implements Parcelable {
 
+    private Long productID = null;
     private String title = "";
     private String description = "";
     private ArrayList<String> picUrl = new ArrayList<>();
@@ -24,6 +25,7 @@ public class ItemsModel implements Parcelable {
 
     // Parcelable constructor
     protected ItemsModel(Parcel in) {
+        productID = (Long) in.readValue(Long.class.getClassLoader());
         title = in.readString();
         description = in.readString();
         picUrl = in.createStringArrayList();
@@ -35,6 +37,7 @@ public class ItemsModel implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(productID);
         dest.writeString(title);
         dest.writeString(description);
         dest.writeStringList(picUrl);

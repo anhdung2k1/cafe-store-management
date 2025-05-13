@@ -15,6 +15,7 @@ import com.store.mycoffeestore.model.ItemsModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -100,7 +101,8 @@ public class MainViewModel extends ViewModel {
         List<ItemsModel> items = new ArrayList<>();
         for (Map<String, Object> map : data) {
             ItemsModel item = new ItemsModel();
-
+            Log.d("RESPONSE_PRODUCT", map.toString());
+            item.setProductID(((Number) Objects.requireNonNull(map.get("productID"))).longValue());
             item.setTitle((String) map.get("productName"));
             item.setDescription((String) map.get("productDescription"));
 

@@ -22,6 +22,7 @@ import com.store.mycoffeestore.model.ItemsModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -117,7 +118,9 @@ public class CartActivity extends AppCompatActivity {
     private List<ItemsModel> parseCartItems(List<Map<String, Object>> rawList) {
         List<ItemsModel> items = new ArrayList<>();
         for (Map<String, Object> map : rawList) {
+            Log.d("DEBUG_CART_ITEM", "map keys: " + map.keySet());
             ItemsModel item = new ItemsModel();
+            item.setProductID(((Number) Objects.requireNonNull(map.get("productID"))).longValue());
             item.setTitle((String) map.get("productName"));
             item.setDescription((String) map.get("productDescription"));
 

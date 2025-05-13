@@ -109,7 +109,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     private void updateCartOnServer(ItemsModel item, boolean isUpdate) {
         Product product = getProduct(item);
-
+        Log.d("updateCartOnServer", "product: " + product);
         ApiService api = ApiClient.getSecuredApiService(context);
         Call<Map<String, Object>> call = isUpdate
                 ? api.addToCart(userId, product)   // POST
@@ -136,6 +136,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     @NonNull
     private static Product getProduct(ItemsModel item) {
         Product product = new Product();
+        product.setProductID(item.getProductID());
         product.setProductName(item.getTitle());
         product.setProductModel(item.getExtra() == null ? "DefaultProductModel" : item.getExtra());
         product.setProductPrice(item.getPrice());
