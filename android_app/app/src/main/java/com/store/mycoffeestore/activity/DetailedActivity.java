@@ -145,6 +145,7 @@ public class DetailedActivity extends AppCompatActivity {
                     public void onResponse(@NonNull Call<Map<String, Long>> call, @NonNull Response<Map<String, Long>> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             userId = response.body().get("id");
+                            Log.d("DetailedActivity", "DetailedActivity(...): userId = " + userId);
                         } else {
                             Toast.makeText(DetailedActivity.this, "Cannot get userId", Toast.LENGTH_SHORT).show();
                         }
@@ -189,6 +190,7 @@ public class DetailedActivity extends AppCompatActivity {
     @NonNull
     private Product getProduct() {
         Product product = new Product();
+        product.setProductID(item.getProductID());
         product.setProductName(item.getTitle());
         product.setProductModel(selectedSize);
         product.setProductPrice(item.getPrice());
