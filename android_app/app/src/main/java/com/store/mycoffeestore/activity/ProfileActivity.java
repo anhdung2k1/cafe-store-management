@@ -13,7 +13,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.store.mycoffeestore.R;
+import com.store.mycoffeestore.helper.NavigationHelper;
 
 import java.io.IOException;
 
@@ -49,6 +51,9 @@ public class ProfileActivity extends AppCompatActivity {
         initViews();
         initListeners();
         populateSampleData();
+
+        BottomNavigationView nav = findViewById(R.id.bottom_navigation);
+        NavigationHelper.setupBottomNavigation(this, nav, R.id.profile_btn);
     }
 
     private void initViews() {
