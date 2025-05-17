@@ -3,13 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/home_btn"
         android:title=""
-        android:icon="@drawable/bottom_btn1"
+        android:icon="@drawable/home_btn"
         app:iconTint="@color/black"/>
 
     <item
+        android:id="@+id/profile_btn"
         android:title=""
-        android:icon="@drawable/bottom_btn2"
+        android:icon="@drawable/profile_btn"
         app:iconTint="@color/black"/>
 
     <item
@@ -18,13 +20,14 @@
         android:enabled="false"/>
 
     <item
+        android:id="@+id/payment_btn"
         android:title=""
         android:icon="@drawable/bottom_btn3"
         app:iconTint="@color/black"/>
 
     <item
+        android:id="@+id/setting_btn"
         android:icon="@drawable/bottom_btn4"
         android:title=""
         app:iconTint="@color/black"/>
-
 </menu>
