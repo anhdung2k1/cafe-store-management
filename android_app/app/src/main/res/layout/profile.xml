@@ -37,18 +37,30 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/top_profile_background" />
 
-                <ImageView
-                    android:id="@+id/avatar_image"
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/avatar_card"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:layout_marginTop="150dp"
                     android:layout_marginBottom="8dp"
-                    android:scaleType="centerCrop"
-                    android:padding="4dp"
+                    app:cardCornerRadius="75dp"
+                    app:cardElevation="4dp"
+                    app:cardPreventCornerOverlap="false"
+                    app:cardUseCompatPadding="false"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:srcCompat="@drawable/profile_avatar" />
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <ImageView
+                        android:id="@+id/avatar_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:contentDescription="User Avatar"
+                        android:padding="4dp"
+                        app:srcCompat="@drawable/profile_avatar" />
+
+                </androidx.cardview.widget.CardView>
 
                 <!-- Edit Avatar Button -->
                 <ImageView
@@ -59,8 +71,8 @@
                     android:clickable="true"
                     android:contentDescription="Edit Avatar"
                     android:src="@drawable/ic_edit"
-                    app:layout_constraintBottom_toBottomOf="@+id/avatar_image"
-                    app:layout_constraintEnd_toEndOf="@+id/avatar_image" />
+                    app:layout_constraintBottom_toBottomOf="@+id/avatar_card"
+                    app:layout_constraintEnd_toEndOf="@+id/avatar_card" />
 
                 <TextView
                     android:id="@+id/username"
@@ -70,7 +82,7 @@
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:textColor="#333"
-                    app:layout_constraintTop_toBottomOf="@id/avatar_image"
+                    app:layout_constraintTop_toBottomOf="@id/avatar_card"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
