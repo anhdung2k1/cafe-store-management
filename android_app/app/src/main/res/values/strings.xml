@@ -19,4 +19,25 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="toggle_password_visibility">toggle_visibility</string>
+    <string name="edit_password_btn_desc">edit_password_btn</string>
+    <string name="profile_background">Profile background</string>
+    <string name="user_avatar">User Avatar</string>
+    <string name="edit_avatar">Edit Avatar</string>
+    <string name="user_name">USER NAME</string>
+    <string name="email_example_gmail_com">email_example@gmail.com</string>
+    <string name="home_ic">home_ic</string>
+    <string name="_123_street_abc_city">123 Street, ABC city</string>
+    <string name="_123_street_abc_city_edit">123 Street, ABC city</string>
+    <string name="edit_address">edit_address</string>
+    <string name="birthday_text">01 Jan 1990</string>
+    <string name="birthday_edit">01 Jan 1990</string>
+    <string name="male_text">Male</string>
+    <string name="password_visibility">********</string>
+    <string name="card_view">card_view</string>
+    <string name="calendar_view">calendar_view</string>
+    <string name="person_ic">person_ic</string>
+    <string name="edit_gender">edit_gender</string>
+    <string name="ic_password">ic_password</string>
+    <string name="shopping_cart">Shopping Cart</string>
 </resources>
