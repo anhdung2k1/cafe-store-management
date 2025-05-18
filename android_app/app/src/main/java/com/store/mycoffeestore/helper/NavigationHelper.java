@@ -15,6 +15,15 @@ import com.store.mycoffeestore.activity.ProfileActivity;
 
 public class NavigationHelper {
 
+    /**
+     * Configures bottom navigation and floating action button behavior for an activity.
+     *
+     * Sets the selected item in the bottom navigation view and attaches listeners to handle navigation between main sections of the app (home, profile, order) and to open the cart via the floating action button. Disables transition animations when switching activities. If required views are missing, logs a warning and exits without making changes.
+     *
+     * @param activity the current activity where navigation is being set up
+     * @param bottomNavigationView the bottom navigation view to configure
+     * @param selectedItemId the menu item ID to mark as selected initially
+     */
     public static void setupBottomNavigation(final Activity activity, BottomNavigationView bottomNavigationView, int selectedItemId) {
         if (activity == null || bottomNavigationView == null) {
             Log.w("NavigationHelper", "Did not find activity" + activity + "bottomNavigationView" + bottomNavigationView);

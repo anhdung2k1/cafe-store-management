@@ -56,19 +56,48 @@ public interface ApiService {
     @PATCH("wishlist/user/{userId}/remove")
     Call<Boolean> clearWishlist(@Path("userId") Long userId);
 
-    // ===== ORDERS =====
+    /**
+     * Retrieves a list of all orders.
+     *
+     * @return a Call object for a list of Order instances representing all orders in the system
+     */
     @GET("orders")
     Call<List<Order>> getAllOrders();
 
+    /**
+     * Retrieves all orders placed by a specific user.
+     *
+     * @param userId the unique identifier of the user whose orders are to be fetched
+     * @return a Call object for a list of Order objects associated with the user
+     */
     @GET("orders/{userID}")
     Call<List<Order>> getOrdersByUser(@Path("userID") Long userId);
 
+    /**
+     * Retrieves the details of a specific order by its ID.
+     *
+     * @param orderId the unique identifier of the order to retrieve
+     * @return a Call object for the requested Order
+     */
     @GET("orders/order/{orderID}")
     Call<Order> getOrderById(@Path("orderID") Long orderId);
 
+    /**
+     * Updates the status of an existing order.
+     *
+     * @param orderId the unique identifier of the order to update
+     * @param status the new status to set for the order
+     * @return a Call object for the updated Order
+     */
     @PATCH("orders/order/{orderID}")
     Call<Order> updateOrder(@Path("orderID") Long orderId, @Body String status);
 
+    /**
+     * Deletes an order by its ID.
+     *
+     * @param orderId the unique identifier of the order to delete
+     * @return a map indicating whether the deletion was successful
+     */
     @DELETE("orders/order/{orderID}")
     Call<Map<String, Boolean>> deleteOrder(@Path("orderID") Long orderId);
 

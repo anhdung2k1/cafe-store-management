@@ -35,6 +35,11 @@ public class CartActivity extends AppCompatActivity {
     private final double delivery = 15.0;
     private Long userId;
 
+    /**
+     * Initializes the cart activity, sets up the user interface, and loads the current user's cart data.
+     *
+     * @param savedInstanceState the previously saved state of the activity, or null if none
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +50,11 @@ public class CartActivity extends AppCompatActivity {
         fetchUserIdAndCart();
     }
 
+    /**
+     * Initializes UI components for the cart view and sets up the checkout button listener.
+     *
+     * Binds view elements to their corresponding fields and configures the checkout button to validate the cart before proceeding with order creation or update.
+     */
     private void initViews() {
         rvCartView = findViewById(R.id.rvCartView);
         ivBack = findViewById(R.id.ivBack);
@@ -64,6 +74,9 @@ public class CartActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Sets the back button to navigate to the main activity, clearing the activity stack.
+     */
     private void setVariable() {
         ivBack.setOnClickListener(view -> {
             Log.d("DEBUG_BACK", "Back button clicked");
@@ -73,6 +86,11 @@ public class CartActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Retrieves the current user's ID using the username from the token and loads the user's cart items.
+     *
+     * If the username cannot be extracted or the user ID cannot be fetched, displays an error message.
+     */
     private void fetchUserIdAndCart() {
         TokenManager tokenManager = new TokenManager(this);
         String userName = tokenManager.getUserNameFromToken();
@@ -100,6 +118,12 @@ public class CartActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Loads the current user's cart items from the API and updates the cart display.
+     *
+     * Retrieves the cart data for the user, parses the product list, updates the cart item list,
+     * refreshes the cart adapter, and recalculates price summaries. Shows a toast message if loading fails.
+     */
     private void fetchCartItems() {
         ApiClient.getSecuredApiService(this).getCart(userId)
                 .enqueue(new Callback<>() {
@@ -123,6 +147,15 @@ public class CartActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Converts a list of raw product data maps into a list of {@code ItemsModel} objects for the cart.
+     *
+     * Each map is expected to contain product details such as ID, name, description, price, rating, model, quantity, and image URL.
+     * Handles missing or incorrectly typed fields by applying default values.
+     *
+     * @param rawList list of maps representing raw product data from the cart API response
+     * @return a list of parsed {@code ItemsModel} objects
+     */
     private List<ItemsModel> parseCartItems(List<Map<String, Object>> rawList) {
         List<ItemsModel> items = new ArrayList<>();
         for (Map<String, Object> map : rawList) {
@@ -149,11 +182,22 @@ public class CartActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Configures the RecyclerView to display the current cart items using a CartAdapter.
+     *
+     * Initializes the layout manager and sets the adapter with the current list of cart items,
+     * user ID, and a callback to recalculate the cart totals when changes occur.
+     */
     private void setupCartAdapter() {
         rvCartView.setLayoutManager(new LinearLayoutManager(this));
         rvCartView.setAdapter(new CartAdapter(new ArrayList<>(cartItems), this, userId, this::calculateCart));
     }
 
+    /**
+     * Calculates and updates the cart's subtotal, tax, delivery fee, and total price in the UI.
+     *
+     * Computes the subtotal by summing the price and quantity of all items in the cart, applies a 2% tax, adds a fixed delivery fee, and displays the results in the corresponding TextViews.
+     */
     @SuppressLint("SetTextI18n")
     private void calculateCart() {
         double subtotal = 0.0;
@@ -170,6 +214,9 @@ public class CartActivity extends AppCompatActivity {
         totalPriceTxt.setText("$" + total);
     }
 
+    /**
+     * Checks for existing orders for the current user and updates the latest order's status if found; otherwise, initiates a new transaction.
+     */
     private void handleOrderCreationOrUpdate() {
         ApiClient.getSecuredApiService(this).getOrdersByUser(userId)
                 .enqueue(new Callback<>() {
@@ -190,6 +237,12 @@ public class CartActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Validates user input and initiates the creation of a new checkout transaction for the current cart.
+     *
+     * If the shipping address is empty or no payment method is selected, displays a toast and aborts the operation.
+     * On successful transaction creation, shows a confirmation toast; otherwise, displays an error message.
+     */
     private void createTransaction() {
         String address = addressText.getText().toString().trim();
         if (address.isEmpty()) {
@@ -233,6 +286,11 @@ public class CartActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Returns the selected payment method as a string based on the checked radio button.
+     *
+     * @return the name of the selected payment method, or null if none is selected
+     */
     private String getSelectedPaymentMethod() {
         int id = paymentGroup.getCheckedRadioButtonId();
         if (id == R.id.creditCard) return "Credit Card";
@@ -242,6 +300,12 @@ public class CartActivity extends AppCompatActivity {
         return null;
     }
 
+    /**
+     * Extracts a numeric value from a TextView containing a price string with a dollar sign.
+     *
+     * @param tv the TextView displaying the price (e.g., "$12.34")
+     * @return the parsed double value, or 0.0 if parsing fails
+     */
     private double parseTotal(TextView tv) {
         try {
             return Double.parseDouble(tv.getText().toString().replace("$", "").trim());
@@ -250,6 +314,12 @@ public class CartActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Updates the status of an existing order via the API and displays a toast message indicating success or failure.
+     *
+     * @param orderId the ID of the order to update
+     * @param status the new status to set for the order
+     */
     private void updateOrderStatus(Long orderId, String status) {
         ApiClient.getSecuredApiService(this).updateOrder(orderId, status)
                 .enqueue(new Callback<>() {
