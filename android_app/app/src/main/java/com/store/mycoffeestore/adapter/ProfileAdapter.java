@@ -76,6 +76,10 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHold
                 } else {
                     // Xác nhận sửa
                     String updatedText = holder.editValue.getText().toString().trim();
+                    if (updatedText.isEmpty()) {
+                        holder.editValue.setError("Field cannot be empty");
+                        return;
+                    }
                     holder.value.setText(updatedText);
                     holder.value.setVisibility(View.VISIBLE);
                     holder.editValue.setVisibility(View.GONE);

@@ -98,7 +98,10 @@ public class CartActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<Map<String, Object>> call, @NonNull Response<Map<String, Object>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Map<String, Object>> rawProducts = (List<Map<String, Object>>) response.body().get("products");
-                    assert rawProducts != null;
+                    if (rawProducts == null) {
+                        Toast.makeText(CartActivity.this, "Failed to load cart data", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     cartItems = parseCartItems(rawProducts);
                     setupCartAdapter();
                     calculateCart();
@@ -108,7 +111,7 @@ public class CartActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+            public void onFailure(@NonNull Call<Map<String, Object>> call, @NonNull Throwable t) {
                 Toast.makeText(CartActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("CartActivity", "onFailure: ", t);
             }
