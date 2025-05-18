@@ -99,29 +99,45 @@ public class CartServiceImpl implements CartService {
     @Override
     public Map<String, Object> updateCartItems(Long userId, Product product) throws Exception {
         try {
-            CartEntity cartEntity = cartRepository.getCartEntityWithUserId(userId).isPresent()
-                    ? cartRepository.getCartEntityWithUserId(userId).get() : null;
-            assert cartEntity != null;
-            if (product != null) {
-                List<ProductEntity> cartProducts = cartEntity.getProducts();
-                if (productRepository.findById(product.getProductID()).isPresent()) {
-                    ProductEntity productRemoveEntity = productRepository.findById(product.getProductID()).get();
-                    // Remove the product in the list
-                    cartProducts.remove(productRemoveEntity);
-                    // Update the carts again
-                    cartEntity.setProducts(cartProducts);
-                    cartRepository.save(cartEntity);
+            CartEntity cartEntity = cartRepository.getCartEntityWithUserId(userId)
+                    .orElseThrow(() -> new Exception("Cart not found"));
+            
+            List<ProductEntity> cartProducts = cartEntity.getProducts();
+
+            Optional<ProductEntity> optionalProduct = productRepository.findById(product.getProductID());
+
+            if (optionalProduct.isPresent()) {
+                ProductEntity productEntity = optionalProduct.get();
+
+                int index = cartProducts.indexOf(productEntity);
+                if (index != -1) {
+                    ProductEntity existing = cartProducts.get(index);
+                    int currentQty = existing.getProductQuantity();
+                    int newQty = product.getProductQuantity();
+
+                    if (newQty < currentQty) {
+                        log.info("Quantity reduced from {} to {}", currentQty, newQty);
+                    } else {
+                        log.info("Quantity increased from {} to {}", currentQty, newQty);
+                    }
+
+                    if (newQty <= 0) {
+                        cartProducts.remove(index);
+                    } else {
+                        existing.setProductQuantity(newQty);
+                        cartProducts.set(index, existing);
+                    }
                 }
-                else {
-                    log.warn("The product ID given is not present: " + product.getProductID());
-                }
+                // update cart
+                cartEntity.setProducts(cartProducts);
+                cartRepository.save(cartEntity);
+            } else {
+                log.info("Product ID does not exist: {}", product.getProductID());
             }
-            else {
-                log.info("There is no items to remove");
-            }
+
             return cartMap(cartEntity);
-        } catch (NoSuchElementException e) {
-            throw new Exception("Could not get cart items " + e.getMessage());
+        } catch (Exception e) {
+            throw new Exception("Could not update cart items: " + e.getMessage(), e);
         }
     }
 }

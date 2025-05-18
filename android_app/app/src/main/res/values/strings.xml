@@ -40,4 +40,8 @@
     <string name="edit_gender">edit_gender</string>
     <string name="ic_password">ic_password</string>
     <string name="shopping_cart">Shopping Cart</string>
+    <string name="logout">logout</string>
+    <string name="edit">EDIT</string>
+    <string name="value">Value</string>
+    <string name="title">Title</string>
 </resources>
