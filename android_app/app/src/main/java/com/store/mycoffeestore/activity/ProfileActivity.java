@@ -31,7 +31,11 @@ public class ProfileActivity extends AppCompatActivity {
     private RecyclerView profileRecycler;
     private final List<Object[]> profileItems = new ArrayList<>();
     private Long userId;
-    private Users currentUser; // lưu bản sao để cập nhật dễ hơn
+    private Users currentUser; /**
+     * Initializes the profile activity, sets up the layout, navigation, and begins loading the user's profile data.
+     *
+     * @param savedInstanceState the previously saved state of the activity, if any
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
