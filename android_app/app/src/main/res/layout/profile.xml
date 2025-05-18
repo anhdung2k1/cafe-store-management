@@ -29,7 +29,7 @@
                     android:id="@+id/imageView"
                     android:layout_width="0dp"
                     android:layout_height="250dp"
-                    android:contentDescription="Profile background"
+                    android:contentDescription="@string/profile_background"
                     android:scaleType="centerCrop"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
@@ -56,29 +56,36 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        android:contentDescription="User Avatar"
+                        android:contentDescription="@string/user_avatar"
                         android:padding="4dp"
                         app:srcCompat="@drawable/profile_avatar" />
 
                 </androidx.cardview.widget.CardView>
 
                 <!-- Edit Avatar Button -->
-                <ImageView
-                    android:id="@+id/edit_avatar_btn"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
+                <FrameLayout
+                    android:id="@+id/edit_avatar_btn_container"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:clickable="true"
-                    android:contentDescription="Edit Avatar"
-                    android:src="@drawable/ic_edit"
+                    android:focusable="true"
                     app:layout_constraintBottom_toBottomOf="@+id/avatar_card"
-                    app:layout_constraintEnd_toEndOf="@+id/avatar_card" />
+                    app:layout_constraintEnd_toEndOf="@+id/avatar_card">
+
+                    <ImageView
+                        android:id="@+id/edit_avatar_btn"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/edit_avatar"
+                        android:src="@drawable/ic_edit" />
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Quang Nho"
+                    android:text="@string/user_name"
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:textColor="#333"
@@ -90,7 +97,7 @@
                     android:id="@+id/email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="123@gmail.com"
+                    android:text="@string/email_example_gmail_com"
                     android:textSize="16sp"
                     android:textColor="#666"
                     app:layout_constraintTop_toBottomOf="@id/username"
@@ -117,6 +124,7 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
+                        android:contentDescription="@string/home_ic"
                         android:src="@drawable/ic_home" />
 
                     <TextView
@@ -125,7 +133,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:text="123 Street, ABC city"
+                        android:text="@string/_123_street_abc_city"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#333" />
@@ -136,18 +144,30 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
+                        android:autofillHints=""
+                        android:inputType="text"
                         android:visibility="gone"
-                        android:text="123 Street, ABC city"
+                        android:text="@string/_123_street_abc_city_edit"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:textColor="#333" />
+                        android:textColor="#333"
+                        tools:ignore="LabelFor" />
 
-                    <ImageView
-                        android:id="@+id/edit_address_btn"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                    <FrameLayout
+                        android:id="@+id/edit_address_btn_container"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:clickable="true"
-                        app:srcCompat="@drawable/ic_edit" />
+                        android:focusable="true">
+
+                        <ImageView
+                            android:id="@+id/edit_address_btn"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@string/edit_address"
+                            app:srcCompat="@drawable/ic_edit" />
+                    </FrameLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -161,6 +181,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:contentDescription="@string/card_view"
                     android:orientation="horizontal"
                     android:padding="16dp"
                     android:gravity="center_vertical">
@@ -168,6 +189,7 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
+                        android:contentDescription="@string/calendar_view"
                         android:src="@drawable/ic_calendar" />
 
                     <TextView
@@ -176,7 +198,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:text="01 Jan 1990"
+                        android:text="@string/birthday_text"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#333" />
@@ -187,18 +209,30 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
+                        android:autofillHints=""
+                        android:inputType="date"
                         android:visibility="gone"
-                        android:text="01 Jan 1990"
+                        android:text="@string/birthday_edit"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:textColor="#333" />
+                        android:textColor="#333"
+                        tools:ignore="LabelFor" />
 
-                    <ImageView
-                        android:id="@+id/edit_birthday_btn"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                    <FrameLayout
+                        android:id="@+id/edit_birthday_btn_container"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:clickable="true"
-                        app:srcCompat="@drawable/ic_edit" />
+                        android:focusable="true">
+
+                        <ImageView
+                            android:id="@+id/edit_birthday_btn"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@string/birthday_edit"
+                            app:srcCompat="@drawable/ic_edit" />
+                    </FrameLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -219,7 +253,9 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        app:srcCompat="@drawable/ic_person" />
+                        android:contentDescription="@string/person_ic"
+                        app:srcCompat="@drawable/ic_person"
+                        tools:ignore="ContentDescription" />
 
                     <TextView
                         android:id="@+id/gender"
@@ -227,7 +263,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:text="Male"
+                        android:text="@string/male_text"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#333" />
@@ -238,18 +274,30 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
+                        android:autofillHints=""
+                        android:inputType="text"
                         android:visibility="gone"
-                        android:text="Male"
+                        android:text="@string/male_text"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:textColor="#333" />
+                        android:textColor="#333"
+                        tools:ignore="LabelFor" />
 
-                    <ImageView
-                        android:id="@+id/edit_gender_btn"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                    <FrameLayout
+                        android:id="@+id/edit_gender_btn_container"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:clickable="true"
-                        app:srcCompat="@drawable/ic_edit" />
+                        android:focusable="true">
+
+                        <ImageView
+                            android:id="@+id/edit_gender_btn"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@string/edit_gender"
+                            app:srcCompat="@drawable/ic_edit" />
+                    </FrameLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -270,6 +318,7 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
+                        android:contentDescription="@string/ic_password"
                         app:srcCompat="@drawable/ic_password" />
 
                     <TextView
@@ -278,7 +327,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:text="********"
+                        android:text="@string/password_visibility"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#333" />
@@ -289,26 +338,47 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
+                        android:autofillHints=""
+                        android:inputType="textPassword"
                         android:visibility="gone"
-                        android:text="********"
+                        android:text="@string/password_visibility"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:textColor="#333" />
+                        android:textColor="#333"
+                        tools:ignore="LabelFor" />
 
-                    <ImageView
-                        android:id="@+id/view_hide_btn"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="10dp"
+                    <FrameLayout
+                        android:id="@+id/view_hide_btn_container"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:clickable="true"
-                        app:srcCompat="@drawable/ic_hide" />
+                        android:focusable="true">
 
-                    <ImageView
-                        android:id="@+id/edit_password_btn"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        <ImageView
+                            android:id="@+id/view_hide_btn"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@string/toggle_password_visibility"
+                            app:srcCompat="@drawable/ic_hide"
+                            app:tint="@color/black" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/edit_password_btn_container"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:clickable="true"
-                        app:srcCompat="@drawable/ic_edit" />
+                        android:focusable="true">
+
+                        <ImageView
+                            android:id="@+id/edit_password_btn"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@string/edit_password_btn_desc"
+                            app:srcCompat="@drawable/ic_edit" />
+                    </FrameLayout>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

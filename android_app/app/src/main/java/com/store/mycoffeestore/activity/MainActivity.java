@@ -1,6 +1,5 @@
 package com.store.mycoffeestore.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -10,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.store.mycoffeestore.R;
 import com.store.mycoffeestore.adapter.CategoryAdapter;
@@ -21,7 +19,7 @@ import com.store.mycoffeestore.viewmodel.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
-    private MainViewModel viewModel = new MainViewModel();
+    private final MainViewModel viewModel = new MainViewModel();
 
     private RecyclerView recyclerViewCategory, recyclerViewPopular, recyclerViewOffer;
     private ProgressBar progressBarCategory, progressBarPopular, progressBarOffer;

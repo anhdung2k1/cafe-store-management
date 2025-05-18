@@ -20,7 +20,8 @@
             app:fabCradleMargin="8dp"
             app:fabCradleRoundedCornerRadius="50dp"
             app:fabCradleVerticalOffset="6dp"
-            android:backgroundTint="@color/white">
+            android:backgroundTint="@android:color/transparent"
+            tools:ignore="VisualLintBottomAppBar">
 
             <com.google.android.material.bottomnavigation.BottomNavigationView
                 android:id="@+id/bottom_navigation"
@@ -32,20 +33,21 @@
                 android:background="@android:color/transparent"
                 app:itemIconTint="@color/black"
                 app:itemTextColor="@color/black"
-                app:menu="@menu/nav_item"/>
+                app:menu="@menu/nav_item"
+                tools:ignore="VisualLintBottomNav" />
 
         </com.google.android.material.bottomappbar.BottomAppBar>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/cart_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/cart"
-            android:id="@+id/cart_btn"
-            app:tint="@color/white"
-            app:backgroundTint="@color/orange"
-            app:maxImageSize="25dp"
-            app:layout_anchor="@id/app_bar"
+            android:contentDescription="@string/shopping_cart"
             android:pointerIcon="wait"
-            tools:ignore="ContentDescription" />
+            android:src="@drawable/cart"
+            app:backgroundTint="@color/orange"
+            app:layout_anchor="@id/app_bar"
+            app:maxImageSize="25dp"
+            app:tint="@color/white"/>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

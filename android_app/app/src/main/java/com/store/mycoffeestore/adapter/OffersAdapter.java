@@ -2,6 +2,7 @@ package com.store.mycoffeestore.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import com.bumptech.glide.Glide;
 import android.widget.TextView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.store.mycoffeestore.R;
+import com.store.mycoffeestore.activity.DetailedActivity;
 import com.store.mycoffeestore.model.ItemsModel;
 
 import java.util.List;
@@ -48,7 +50,9 @@ public class OffersAdapter extends RecyclerView.Adapter<OffersAdapter.ViewHolder
                 .into(holder.shapeableImageView);
 
         holder.itemView.setOnClickListener(v -> {
-            // Handle item click here
+            Intent intent = new Intent(holder.itemView.getContext(), DetailedActivity.class);
+            intent.putExtra("object", item); // item is ItemsModel (Parcelable)
+            holder.itemView.getContext().startActivity(intent);
         });
     }
 

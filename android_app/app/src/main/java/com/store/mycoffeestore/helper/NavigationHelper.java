@@ -13,6 +13,9 @@ import com.store.mycoffeestore.activity.ProfileActivity;
 public class NavigationHelper {
 
     public static void setupBottomNavigation(final Activity activity, BottomNavigationView bottomNavigationView, int selectedItemId) {
+        if (activity == null || bottomNavigationView == null) {
+            return;
+        }
         bottomNavigationView.setSelectedItemId(selectedItemId);
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -31,9 +34,7 @@ public class NavigationHelper {
             } else if (itemId == R.id.cart_btn) {
                 activity.startActivity(new Intent(activity, CartActivity.class));
             }
-
             activity.overridePendingTransition(0, 0);
-            activity.finish();
 
             return true;
         });

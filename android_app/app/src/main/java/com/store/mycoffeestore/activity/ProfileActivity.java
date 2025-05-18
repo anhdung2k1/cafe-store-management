@@ -5,18 +5,23 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.store.mycoffeestore.R;
 import com.store.mycoffeestore.helper.NavigationHelper;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -42,9 +47,20 @@ public class ProfileActivity extends AppCompatActivity {
     private String actualPassword = "my_real_password"; // Simulated password
 
     private static final int PICK_IMAGE_REQUEST = 1; // Request code for image picker
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Register the launcher in onCreate
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        handleImageResult(result.getData());
+                    }
+                }
+        );
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile);
 
@@ -94,12 +110,12 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void populateSampleData() {
-        usernameText.setText("Quang Nho");
-        emailText.setText("123@gmail.com");
-        addressText.setText("123 Street, ABC city");
-        birthdayText.setText("01 Jan 1990");
-        genderText.setText("Male");
-        passwordText.setText("********");
+        usernameText.setText(R.string.user_name);
+        emailText.setText(R.string.email_example_gmail_com);
+        addressText.setText(R.string._123_street_abc_city);
+        birthdayText.setText(R.string.birthday_text);
+        genderText.setText(R.string.male_text);
+        passwordText.setText(R.string.password_visibility);
 
         // Set default avatar
         avatarImageView.setImageResource(R.drawable.profile_avatar);
@@ -167,7 +183,22 @@ public class ProfileActivity extends AppCompatActivity {
     private void openImagePicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        imagePickerLauncher.launch(intent);
+    }
+
+    private void handleImageResult(Intent data) {
+        Uri selectedImageUri = data.getData();
+        if (selectedImageUri != null) {
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
+                avatarImageView.setImageBitmap(bitmap);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                Log.e("ProfileActivity", "Error loading image", e);
+                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -176,12 +207,10 @@ public class ProfileActivity extends AppCompatActivity {
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri selectedImageUri = data.getData();
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
-                avatarImageView.setImageBitmap(bitmap); // Set selected image as avatar
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Glide.with(this)
+                    .load(selectedImageUri)
+                    .circleCrop()
+                    .into(avatarImageView);
         }
     }
 }

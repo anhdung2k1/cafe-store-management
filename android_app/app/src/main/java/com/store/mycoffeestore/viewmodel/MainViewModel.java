@@ -86,7 +86,14 @@ public class MainViewModel extends ViewModel {
             public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<ItemsModel> items = convertToItemsModel(response.body());
-                    _offer.setValue(items);
+                    if (!items.isEmpty()) {
+                        Log.d("loadOffer", "Offer loaded: " + items.size());
+                        _offer.setValue(items);
+                    } else {
+                        Log.w("loadOffer", "Offer list is empty");
+                    }
+                } else {
+                    Log.e("loadOffer", "Response failed or null body");
                 }
             }
 
@@ -100,38 +107,46 @@ public class MainViewModel extends ViewModel {
     private List<ItemsModel> convertToItemsModel(List<Map<String, Object>> data) {
         List<ItemsModel> items = new ArrayList<>();
         for (Map<String, Object> map : data) {
-            ItemsModel item = new ItemsModel();
-            Log.d("RESPONSE_PRODUCT", map.toString());
-            item.setProductID(((Number) Objects.requireNonNull(map.get("productID"))).longValue());
-            item.setTitle((String) map.get("productName"));
-            item.setDescription((String) map.get("productDescription"));
+            try {
+                ItemsModel item = new ItemsModel();
+                Log.d("RESPONSE_PRODUCT", map.toString());
 
-            Object priceObj = map.get("productPrice");
-            item.setPrice(priceObj instanceof Number ? ((Number) priceObj).doubleValue() : 0.0);
+                Object idObj = map.get("productID");
+                if (idObj instanceof Number) {
+                    item.setProductID(((Number) idObj).longValue());
+                } else {
+                    continue; // Bỏ qua nếu thiếu ID
+                }
 
-            Object ratingObj = map.get("rating");
-            if (ratingObj instanceof Map) {
-                Map<String, Object> ratingMap = (Map<String, Object>) ratingObj;
-                Object rate = ratingMap.get("rate");
-                if (rate instanceof Number) {
-                    item.setRating(((Number) rate).floatValue());
+                item.setTitle((String) map.getOrDefault("productName", "No Title"));
+                item.setDescription((String) map.getOrDefault("productDescription", ""));
+
+                Object priceObj = map.get("productPrice");
+                item.setPrice(priceObj instanceof Number ? ((Number) priceObj).doubleValue() : 0.0);
+
+                Object ratingObj = map.get("rating");
+                if (ratingObj instanceof Map) {
+                    Map<String, Object> ratingMap = (Map<String, Object>) ratingObj;
+                    Object rate = ratingMap.get("rate");
+                    item.setRating(rate instanceof Number ? ((Number) rate).floatValue() : 0f);
                 } else {
                     item.setRating(0f);
                 }
-            } else {
-                item.setRating(0f);
+
+                item.setExtra((String) map.getOrDefault("productModel", ""));
+                item.setNumberInCart(0);
+
+                List<String> picList = new ArrayList<>();
+                Object img = map.get("imageUrl");
+                if (img instanceof String && !((String) img).isEmpty()) {
+                    picList.add((String) img);
+                }
+                item.setPicUrl(new ArrayList<>(picList));
+
+                items.add(item);
+            } catch (Exception e) {
+                Log.e("convertToItemsModel", "Error parsing item: " + e.getMessage(), e);
             }
-
-            item.setExtra((String) map.getOrDefault("productModel", ""));
-            item.setNumberInCart(0);
-
-            List<String> picList = new ArrayList<>();
-            if (map.containsKey("imageUrl")) {
-                picList.add((String) map.get("imageUrl"));
-            }
-            item.setPicUrl(new ArrayList<>(picList));
-
-            items.add(item);
         }
         return items;
     }
