@@ -44,4 +44,5 @@
     <string name="edit">EDIT</string>
     <string name="value">Value</string>
     <string name="title">Title</string>
+    <string name="back">back</string>
 </resources>
