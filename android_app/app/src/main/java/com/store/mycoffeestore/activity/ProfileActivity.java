@@ -1,216 +1,172 @@
 package com.store.mycoffeestore.activity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.store.mycoffeestore.R;
+import com.store.mycoffeestore.adapter.ProfileAdapter;
+import com.store.mycoffeestore.api.ApiClient;
+import com.store.mycoffeestore.api.ApiService;
 import com.store.mycoffeestore.helper.NavigationHelper;
+import com.store.mycoffeestore.helper.TokenManager;
+import com.store.mycoffeestore.model.Users;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    // Text views
-    private TextView usernameText, emailText, addressText, birthdayText, genderText, passwordText;
-
-    // Edit texts
-    private EditText addressEdit, birthdayEdit, genderEdit, passwordEdit;
-
-    // Image buttons
-    private ImageView editAddressBtn, editBirthdayBtn, editGenderBtn, editPasswordBtn, togglePasswordBtn;
-    private ImageView avatarImageView, editAvatarBtn; // Avatar image and edit button
-
-    // Editing states
-    private boolean isEditingAddress = false;
-    private boolean isEditingBirthday = false;
-    private boolean isEditingGender = false;
-    private boolean isEditingPassword = false;
-
-    // Password visibility
-    private boolean isPasswordHidden = true;
-    private String actualPassword = "my_real_password"; // Simulated password
-
-    private static final int PICK_IMAGE_REQUEST = 1; // Request code for image picker
-    private ActivityResultLauncher<Intent> imagePickerLauncher;
+    private RecyclerView profileRecycler;
+    private final List<Object[]> profileItems = new ArrayList<>();
+    private Long userId;
+    private Users currentUser; // lưu bản sao để cập nhật dễ hơn
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Register the launcher in onCreate
-        imagePickerLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        handleImageResult(result.getData());
-                    }
-                }
-        );
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile);
 
-        initViews();
-        initListeners();
-        populateSampleData();
+        profileRecycler = findViewById(R.id.profileRecycler);
 
         BottomNavigationView nav = findViewById(R.id.bottom_navigation);
         NavigationHelper.setupBottomNavigation(this, nav, R.id.profile_btn);
+
+        getUserIdAndLoadProfile();
     }
 
-    private void initViews() {
-        // Mapping Views
-        usernameText = findViewById(R.id.username);
-        emailText = findViewById(R.id.email);
-        addressText = findViewById(R.id.address);
-        birthdayText = findViewById(R.id.birthday);
-        genderText = findViewById(R.id.gender);
-        passwordText = findViewById(R.id.password);
+    private void getUserIdAndLoadProfile() {
+        TokenManager tokenManager = new TokenManager(this);
+        String userName = tokenManager.getUserNameFromToken();
 
-        addressEdit = findViewById(R.id.address_edit);
-        birthdayEdit = findViewById(R.id.birthday_edit);
-        genderEdit = findViewById(R.id.gender_edit);
-        passwordEdit = findViewById(R.id.password_edit);
+        if (userName == null) {
+            Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        editAddressBtn = findViewById(R.id.edit_address_btn);
-        editBirthdayBtn = findViewById(R.id.edit_birthday_btn);
-        editGenderBtn = findViewById(R.id.edit_gender_btn);
-        editPasswordBtn = findViewById(R.id.edit_password_btn);
-        togglePasswordBtn = findViewById(R.id.view_hide_btn);
-
-        // Avatar Views
-        avatarImageView = findViewById(R.id.avatar_image);
-        editAvatarBtn = findViewById(R.id.edit_avatar_btn);
-    }
-
-    private void initListeners() {
-        setupEditField(editAddressBtn, addressText, addressEdit, () -> isEditingAddress = !isEditingAddress);
-        setupEditField(editBirthdayBtn, birthdayText, birthdayEdit, () -> isEditingBirthday = !isEditingBirthday);
-        setupEditField(editGenderBtn, genderText, genderEdit, () -> isEditingGender = !isEditingGender);
-
-        editPasswordBtn.setOnClickListener(v -> togglePasswordEdit());
-        togglePasswordBtn.setOnClickListener(v -> togglePasswordVisibility());
-
-        // Handle avatar edit click
-        editAvatarBtn.setOnClickListener(v -> openImagePicker());
-    }
-
-    private void populateSampleData() {
-        usernameText.setText(R.string.user_name);
-        emailText.setText(R.string.email_example_gmail_com);
-        addressText.setText(R.string._123_street_abc_city);
-        birthdayText.setText(R.string.birthday_text);
-        genderText.setText(R.string.male_text);
-        passwordText.setText(R.string.password_visibility);
-
-        // Set default avatar
-        avatarImageView.setImageResource(R.drawable.profile_avatar);
-    }
-
-    private void setupEditField(ImageView editBtn, TextView textView, EditText editText, Runnable toggleEditingState) {
-        editBtn.setOnClickListener(v -> {
-            boolean isEditing = editText.getVisibility() == View.VISIBLE;
-            if (!isEditing) {
-                editText.setText(textView.getText().toString());
-                textView.setVisibility(View.GONE);
-                editText.setVisibility(View.VISIBLE);
-                editBtn.setImageResource(R.drawable.ic_done);
-                editText.requestFocus();
-            } else {
-                updateTextViewFromEditText(textView, editText);
-                textView.setVisibility(View.VISIBLE);
-                editText.setVisibility(View.GONE);
-                editBtn.setImageResource(R.drawable.ic_edit);
+        ApiService api = ApiClient.getSecuredApiService(this);
+        api.getUserIdByUserName(userName).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Map<String, Long>> call, @NonNull Response<Map<String, Long>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    userId = response.body().get("id");
+                    loadUserProfile(userId);
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Failed to get user ID", Toast.LENGTH_SHORT).show();
+                }
             }
-            toggleEditingState.run();
+
+            @Override
+            public void onFailure(@NonNull Call<Map<String, Long>> call, @NonNull Throwable t) {
+                Toast.makeText(ProfileActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
-    private void updateTextViewFromEditText(TextView textView, EditText editText) {
-        String updatedText = editText.getText().toString().trim();
-        textView.setText(updatedText);
-        Toast.makeText(this, "Saved: " + updatedText, Toast.LENGTH_SHORT).show();
+    private void loadUserProfile(Long userId) {
+        ApiService api = ApiClient.getSecuredApiService(this);
+        api.getUserById(userId).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Map<String, Object>> call, @NonNull Response<Map<String, Object>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Map<String, Object> user = response.body();
+
+                    String userName = (String) user.getOrDefault("userName", "Unknown");
+                    String address = (String) user.getOrDefault("address", "");
+                    String birthDay = (String) user.getOrDefault("birthDay", "");
+                    String gender = (String) user.getOrDefault("gender", "");
+
+                    // Khởi tạo Users model
+                    currentUser = new Users();
+                    currentUser.setUserName(userName);
+                    currentUser.setAddress(address);
+                    currentUser.setBirthDay(birthDay);
+                    currentUser.setGender(gender);
+                    currentUser.setImageUrl((String) user.getOrDefault("imageUrl", ""));
+
+                    profileItems.clear();
+                    profileItems.add(new Object[]{"Username", userName, R.drawable.ic_person, false});
+                    profileItems.add(new Object[]{"Address", address, R.drawable.ic_home, false});
+                    profileItems.add(new Object[]{"Birthday", birthDay, R.drawable.ic_calendar, false});
+                    profileItems.add(new Object[]{"Gender", gender, R.drawable.ic_person, false});
+                    profileItems.add(new Object[]{"Logout", "", R.drawable.ic_logout, true});
+
+                    setupProfileAdapter();
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Failed to load profile", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Map<String, Object>> call, @NonNull Throwable t) {
+                Toast.makeText(ProfileActivity.this, "Error loading profile: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private void togglePasswordVisibility() {
-        if (!isEditingPassword) {
-            if (isPasswordHidden) {
-                passwordText.setText(actualPassword);
-                togglePasswordBtn.setImageResource(R.drawable.ic_view);
+    private void setupProfileAdapter() {
+        ProfileAdapter adapter = new ProfileAdapter(this, profileItems, (title, newValue) -> {
+            if ("Logout".equals(title)) {
+                new TokenManager(ProfileActivity.this).clearSession();
+                Intent intent = new Intent(ProfileActivity.this, SignInActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
             } else {
-                passwordText.setText("********");
-                togglePasswordBtn.setImageResource(R.drawable.ic_hide);
+                updateLocalUser(title, newValue);
+                updateUserOnServer();
             }
-            isPasswordHidden = !isPasswordHidden;
+        });
+
+        profileRecycler.setLayoutManager(new LinearLayoutManager(this));
+        profileRecycler.setAdapter(adapter);
+    }
+
+    private void updateLocalUser(String field, String value) {
+        if (currentUser == null) return;
+
+        switch (field) {
+            case "Address":
+                currentUser.setAddress(value);
+                break;
+            case "Birthday":
+                currentUser.setBirthDay(value);
+                break;
+            case "Gender":
+                currentUser.setGender(value);
+                break;
+            default:
+                break;
         }
     }
 
-    private void togglePasswordEdit() {
-        if (!isEditingPassword) {
-            passwordEdit.setText(actualPassword);
-            passwordText.setVisibility(View.GONE);
-            passwordEdit.setVisibility(View.VISIBLE);
-            editPasswordBtn.setImageResource(R.drawable.ic_done);
-            togglePasswordBtn.setVisibility(View.GONE);
-            passwordEdit.requestFocus();
-        } else {
-            actualPassword = passwordEdit.getText().toString().trim();
-            passwordText.setText("********");
-            passwordText.setVisibility(View.VISIBLE);
-            passwordEdit.setVisibility(View.GONE);
-            editPasswordBtn.setImageResource(R.drawable.ic_edit);
-            togglePasswordBtn.setVisibility(View.VISIBLE);
-            isPasswordHidden = true;
-            Toast.makeText(this, "Password changed", Toast.LENGTH_SHORT).show();
-        }
-        isEditingPassword = !isEditingPassword;
-    }
-
-    private void openImagePicker() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        imagePickerLauncher.launch(intent);
-    }
-
-    private void handleImageResult(Intent data) {
-        Uri selectedImageUri = data.getData();
-        if (selectedImageUri != null) {
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
-                avatarImageView.setImageBitmap(bitmap);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                Log.e("ProfileActivity", "Error loading image", e);
-                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+    private void updateUserOnServer() {
+        ApiService api = ApiClient.getSecuredApiService(this);
+        api.updateUser(userId, currentUser).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Users> call, @NonNull Response<Users> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(ProfileActivity.this, "Profile updated", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Update failed", Toast.LENGTH_SHORT).show();
+                }
             }
-        }
-    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            Uri selectedImageUri = data.getData();
-            Glide.with(this)
-                    .load(selectedImageUri)
-                    .circleCrop()
-                    .into(avatarImageView);
-        }
+            @Override
+            public void onFailure(@NonNull Call<Users> call, @NonNull Throwable t) {
+                Toast.makeText(ProfileActivity.this, "Error updating user: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

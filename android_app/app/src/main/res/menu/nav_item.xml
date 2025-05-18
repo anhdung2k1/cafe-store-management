@@ -20,14 +20,15 @@
         android:enabled="false"/>
 
     <item
-        android:id="@+id/payment_btn"
+        android:id="@+id/order_btn"
+        android:icon="@drawable/ic_order"
         android:title=""
-        android:icon="@drawable/bottom_btn3"
         app:iconTint="@color/black"/>
 
     <item
-        android:id="@+id/setting_btn"
-        android:icon="@drawable/bottom_btn4"
+        android:id="@+id/wishlist_btn"
+        android:icon="@drawable/ic_heart"
         android:title=""
-        app:iconTint="@color/black"/>
+        app:iconTint="@color/black"
+        />
 </menu>

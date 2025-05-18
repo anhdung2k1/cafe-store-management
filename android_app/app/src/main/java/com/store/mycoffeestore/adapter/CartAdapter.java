@@ -70,16 +70,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
         holder.plusCartBtn.setOnClickListener(view -> {
             item.setNumberInCart(item.getNumberInCart() + 1);
-            updateCartOnServer(item, true);
+            updateCartOnServer(item, position);
         });
 
         holder.minusCartBtn.setOnClickListener(view -> {
             int count = item.getNumberInCart();
             if (count > 1) {
                 item.setNumberInCart(count - 1);
-                updateCartOnServer(item, true);
+                updateCartOnServer(item, position);
             } else {
-                updateCartOnServer(item, false);
+                item.setNumberInCart(0);
+                updateCartOnServer(item, position);
                 listItemSelected.remove(position);
                 notifyItemRemoved(position);
             }
@@ -107,19 +108,18 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         }
     }
 
-    private void updateCartOnServer(ItemsModel item, boolean isUpdate) {
+    private void updateCartOnServer(ItemsModel item, int position) {
         Product product = getProduct(item);
-        Log.d("updateCartOnServer", "product: " + product);
+        Log.d("CartAdapter", "Updating cart with product: " + product);
+
         ApiService api = ApiClient.getSecuredApiService(context);
-        Call<Map<String, Object>> call = isUpdate
-                ? api.addToCart(userId, product)   // POST
-                : api.updateCart(userId, product); // PATCH
+        Call<Map<String, Object>> call = api.updateCart(userId, product); // Always use PATCH
 
         call.enqueue(new Callback<>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onResponse(@NonNull Call<Map<String, Object>> call, @NonNull Response<Map<String, Object>> response) {
-                notifyDataSetChanged();
+                notifyItemChanged(position);
                 if (changeNumberItemsListener != null) {
                     changeNumberItemsListener.onChanged();
                 }
