@@ -51,6 +51,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         return new ViewHolder(view);
     }
 
+    /**
+     * Binds the data of a cart item to the corresponding ViewHolder, updating UI elements and handling image loading and quantity changes.
+     *
+     * Updates the item's title, price, quantity, and total price in the view. Loads the item's image if available, or sets a fallback image if not. Handles incrementing and decrementing the item quantity, updating the server and UI accordingly. Removes the item from the list if its quantity reaches zero.
+     *
+     * @param holder   the ViewHolder to bind data to
+     * @param position the position of the item in the adapter's data set
+     */
     @SuppressLint("DefaultLocale")
     @Override
     public void onBindViewHolder(@NonNull CartAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
@@ -114,6 +122,16 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         }
     }
 
+    /**
+     * Updates the cart item on the server with the latest quantity and details.
+     *
+     * Initiates an asynchronous API call to update the specified cart item for the user.
+     * On success, refreshes the item in the adapter and notifies the quantity change listener if present.
+     * On failure, displays a toast message and logs the error.
+     *
+     * @param item the cart item to update
+     * @param position the position of the item in the adapter
+     */
     private void updateCartOnServer(ItemsModel item, int position) {
         Product product = getProduct(item);
         Log.d("CartAdapter", "Updating cart: " + product.getProductName() + ", Qty=" + product.getProductQuantity());
@@ -139,6 +157,16 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         });
     }
 
+    /**
+     * Converts an {@link ItemsModel} object to a {@link Product} object for cart operations.
+     *
+     * Populates the product's fields with corresponding values from the item, including ID, name, model,
+     * price, quantity, description, and type. If the item has a non-empty image URL list, sets the product's
+     * image URL to the first entry.
+     *
+     * @param item the cart item to convert
+     * @return a {@link Product} object populated with the item's data
+     */
     @NonNull
     private static Product getProduct(ItemsModel item) {
         Product product = new Product();

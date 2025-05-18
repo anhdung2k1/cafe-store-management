@@ -23,7 +23,13 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     List<TransactionEntity> findAllTransactionByName(@Param("transactionName") String transactionName);
 
     // For native inserts, you must stick with native queries or use the entity manager.
-    // This is one valid use case to keep as native if you're not persisting UserPaymentEntity directly
+    /**
+                                        * Inserts a new record into the user_payment table linking a payment, user, and transaction.
+                                        *
+                                        * @param paymentId the ID of the payment to associate
+                                        * @param userId the ID of the user to associate
+                                        * @param transactionId the ID of the transaction to associate
+                                        */
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO user_payment(pay_id, user_id, trans_id) VALUES(:paymentId, :userId, :transactionId)", nativeQuery = true)

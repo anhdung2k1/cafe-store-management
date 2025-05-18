@@ -32,6 +32,11 @@ public class OrderActivity extends AppCompatActivity {
     private OrderAdapter adapter;
     private Long userId;
 
+    /**
+     * Initializes the activity, sets up the order list UI, configures navigation, and begins loading user orders.
+     *
+     * @param savedInstanceState the previously saved state of the activity, if any
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +53,11 @@ public class OrderActivity extends AppCompatActivity {
         fetchUserIdThenOrders();
     }
 
+    /**
+     * Retrieves the current user's ID using their username and loads their orders.
+     *
+     * If the user is not logged in, displays a message and aborts the process. Otherwise, fetches the user ID asynchronously and, upon success, initiates loading of the user's orders. Displays error messages if user ID retrieval fails.
+     */
     private void fetchUserIdThenOrders() {
         TokenManager tokenManager = new TokenManager(this);
         String userName = tokenManager.getUserNameFromToken();
@@ -76,6 +86,15 @@ public class OrderActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Retrieves and displays the list of orders for the specified user.
+     *
+     * Initiates an asynchronous API call to fetch orders associated with the given user ID.
+     * Updates the orders list and refreshes the RecyclerView upon successful retrieval.
+     * Shows a toast message if the request fails or returns no data.
+     *
+     * @param userId the ID of the user whose orders are to be loaded
+     */
     private void loadOrders(Long userId) {
         ApiService api = ApiClient.getSecuredApiService(this);
         api.getOrdersByUser(userId).enqueue(new Callback<>() {
