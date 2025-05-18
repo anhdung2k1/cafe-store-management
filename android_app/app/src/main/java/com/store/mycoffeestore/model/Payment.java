@@ -9,4 +9,3 @@ public class Payment {
     private String paymentDescription;
     private String imageUrl;
 }
-

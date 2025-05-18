@@ -61,11 +61,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         holder.numberItemTxt.setText(String.valueOf(item.getNumberInCart()));
         holder.totalEachItem.setText(String.format("$%.2f", item.getPrice() * item.getNumberInCart()));
 
-        if (!item.getPicUrl().isEmpty()) {
+        Log.w("CartAdapter", "Image URL: " + item.getPicUrl());
+        if (item.getPicUrl() != null && !item.getPicUrl().isEmpty()) {
+            String imageUrl = item.getPicUrl().get(0);
+            Log.w("CartAdapter", "Loading image: " + imageUrl);
             Glide.with(context)
-                    .load(item.getPicUrl().get(0))
+                    .load(imageUrl)
                     .apply(new RequestOptions().transform(new CenterCrop()))
                     .into(holder.cartPicture);
+        } else {
+            Log.w("CartAdapter", "Loading fallback image");
+            holder.cartPicture.setImageResource(R.drawable.coffee); // fallback image
         }
 
         holder.plusCartBtn.setOnClickListener(view -> {
@@ -110,10 +116,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     private void updateCartOnServer(ItemsModel item, int position) {
         Product product = getProduct(item);
-        Log.d("CartAdapter", "Updating cart with product: " + product);
+        Log.d("CartAdapter", "Updating cart: " + product.getProductName() + ", Qty=" + product.getProductQuantity());
 
         ApiService api = ApiClient.getSecuredApiService(context);
-        Call<Map<String, Object>> call = api.updateCart(userId, product); // Always use PATCH
+        Call<Map<String, Object>> call = api.updateCart(userId, product);
 
         call.enqueue(new Callback<>() {
             @SuppressLint("NotifyDataSetChanged")
@@ -144,7 +150,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         product.setProductDescription(item.getDescription());
         product.setProductType("Popular");
 
-        if (!item.getPicUrl().isEmpty()) {
+        if (item.getPicUrl() != null && !item.getPicUrl().isEmpty()) {
             product.setImageUrl(item.getPicUrl().get(0));
         }
         return product;

@@ -58,16 +58,16 @@ public interface ApiService {
 
     // ===== ORDERS =====
     @GET("orders")
-    Call<List<Map<String, Object>>> getAllOrders();
+    Call<List<Order>> getAllOrders();
 
     @GET("orders/{userID}")
-    Call<List<Map<String, Object>>> getOrdersByUser(@Path("userID") Long userId);
+    Call<List<Order>> getOrdersByUser(@Path("userID") Long userId);
 
     @GET("orders/order/{orderID}")
-    Call<Map<String, Object>> getOrderById(@Path("orderID") Long orderId);
+    Call<Order> getOrderById(@Path("orderID") Long orderId);
 
     @PATCH("orders/order/{orderID}")
-    Call<Map<String, Object>> updateOrder(@Path("orderID") Long orderId, @Body String status);
+    Call<Order> updateOrder(@Path("orderID") Long orderId, @Body String status);
 
     @DELETE("orders/order/{orderID}")
     Call<Map<String, Boolean>> deleteOrder(@Path("orderID") Long orderId);

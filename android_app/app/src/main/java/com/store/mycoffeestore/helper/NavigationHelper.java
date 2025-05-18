@@ -9,6 +9,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.store.mycoffeestore.R;
 import com.store.mycoffeestore.activity.CartActivity;
 import com.store.mycoffeestore.activity.MainActivity;
+import com.store.mycoffeestore.activity.OrderActivity;
 import com.store.mycoffeestore.activity.ProfileActivity;
 
 
@@ -33,8 +34,8 @@ public class NavigationHelper {
             } else if (itemId == R.id.profile_btn) {
                 Log.w("NavigationHelper", "Start activity Profile");
                 activity.startActivity(new Intent(activity, ProfileActivity.class));
-//            } else if (itemId == R.id.payment_btn) {
-//                activity.startActivity(new Intent(activity, PaymentActivity.class));
+            } else if (itemId == R.id.order_btn) {
+                activity.startActivity(new Intent(activity, OrderActivity.class));
 //            } else if (itemId == R.id.setting_btn) {
 //                activity.startActivity(new Intent(activity, SettingActivity.class));
             }

@@ -24,7 +24,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Base.Theme.CoffeeShop"
-        tools:targetApi="34">
+        >
 
         <activity android:name=".activity.SignInActivity"
             android:exported="false"/>
@@ -41,6 +41,9 @@
             android:name=".activity.DetailedActivity"
             android:exported="false" />
         <activity android:name=".activity.ProfileActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activity.OrderActivity"
             android:exported="false"/>
         <activity
             android:name=".activity.IntroActivity"
