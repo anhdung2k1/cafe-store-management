@@ -1,6 +1,9 @@
 package com.store.mycoffeestore.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,32 +14,29 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.store.mycoffeestore.R;
+import com.store.mycoffeestore.activity.OrderDetailActivity;
 import com.store.mycoffeestore.model.Order;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> {
 
     private final Context context;
-    private final List<Order> orders;
+    private List<Order> orders = new ArrayList<>();
 
-    /**
-     * Constructs an OrderAdapter with the specified context and list of orders.
-     *
-     * @param orders the list of Order objects to display in the adapter
-     */
-    public OrderAdapter(Context context, List<Order> orders) {
+    public OrderAdapter(Context context) {
         this.context = context;
-        this.orders = orders;
     }
 
-    /**
-     * Creates and returns a new ViewHolder for an order item by inflating the corresponding layout.
-     *
-     * @param parent the parent ViewGroup into which the new view will be added
-     * @param viewType the view type of the new view (unused)
-     * @return a new ViewHolder instance for an order item
-     */
+    @SuppressLint("NotifyDataSetChanged")
+    public void setOrders(List<Order> newOrders) {
+        if (newOrders != null) {
+            this.orders = newOrders;
+            notifyDataSetChanged();
+        }
+    }
+
     @NonNull
     @Override
     public OrderAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -44,28 +44,37 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
-    /**
-     * Binds the data from the specified Order to the views in the provided ViewHolder.
-     *
-     * @param holder the ViewHolder containing the views to populate
-     * @param position the position of the Order in the list
-     */
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @Override
     public void onBindViewHolder(@NonNull OrderAdapter.ViewHolder holder, int position) {
         Order order = orders.get(position);
 
+        Log.w("OrderAdapter", "Binding Order: " + order);
+        Log.w("OrderAdapter", "Adapter item count: " + getItemCount());
+
+        String cleanStatus = order.getOrderStatus() != null ? order.getOrderStatus().replace("\"", "") : "Unknown";
+
         holder.orderId.setText("Order #" + order.getOrderID());
-        holder.status.setText(order.getOrderStatus());
+        holder.status.setText(cleanStatus);
         holder.total.setText(String.format("$%.2f", order.getTotalAmount()));
 
-        // Optional: icon tint based on status
+        // Icon based on status
+        if (cleanStatus.equalsIgnoreCase("Success")) {
+            holder.icon.setImageResource(R.drawable.ic_success);
+        } else if (cleanStatus.equalsIgnoreCase("Processing")) {
+            holder.icon.setImageResource(R.drawable.ic_pending);
+        } else {
+            holder.icon.setImageResource(R.drawable.ic_order);
+        }
+
+        // Open OrderDetailActivity with full Order object
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, OrderDetailActivity.class);
+            intent.putExtra("order", order); // Requires Order implements Serializable
+            context.startActivity(intent);
+        });
     }
 
-    /**
-     * Returns the total number of orders in the adapter.
-     *
-     * @return the number of orders displayed in the RecyclerView
-     */
     @Override
     public int getItemCount() {
         return orders.size();
@@ -75,11 +84,6 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
         ImageView icon;
         TextView orderId, status, total;
 
-        /**
-         * Initializes the ViewHolder by caching references to the order item UI components.
-         *
-         * @param itemView the view representing a single order item in the RecyclerView
-         */
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             icon = itemView.findViewById(R.id.order_icon);

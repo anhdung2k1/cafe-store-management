@@ -101,50 +101,150 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp"
             android:text="Select Payment Method"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black" />
 
-        <RadioGroup
-            android:id="@+id/paymentGroup"
+        <LinearLayout
+            android:id="@+id/paymentContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="8dp">
 
-            <RadioButton
-                android:id="@+id/creditCard"
+            <!-- Credit Card -->
+            <LinearLayout
+                android:id="@+id/row_creditCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Credit Card"
-                android:textColor="@color/black"
-                android:buttonTint="@color/black"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
 
-            <RadioButton
-                android:id="@+id/cash"
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_creditcard"
+                    android:contentDescription="Credit Card" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:text="Credit card"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <RadioButton
+                    android:id="@+id/creditCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:buttonTint="@color/black" />
+            </LinearLayout>
+
+            <!-- Cash -->
+            <LinearLayout
+                android:id="@+id/row_cash"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Cash"
-                android:textColor="@color/black"
-                android:buttonTint="@color/black"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
 
-            <RadioButton
-                android:id="@+id/momo"
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_cash"
+                    android:contentDescription="Cash" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:text="Cash"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <RadioButton
+                    android:id="@+id/cash"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:buttonTint="@color/black" />
+            </LinearLayout>
+
+            <!-- MOMO -->
+            <LinearLayout
+                android:id="@+id/row_momo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="MOMO"
-                android:textColor="@color/black"
-                android:buttonTint="@color/black"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
 
-            <RadioButton
-                android:id="@+id/paypal"
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_momo"
+                    android:contentDescription="MOMO" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:text="MOMO"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <RadioButton
+                    android:id="@+id/momo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:buttonTint="@color/black" />
+            </LinearLayout>
+
+            <!-- Paypal -->
+            <LinearLayout
+                android:id="@+id/row_paypal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Paypal"
-                android:textColor="@color/black"
-                android:buttonTint="@color/black"/>
-        </RadioGroup>
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_paypal"
+                    android:contentDescription="Paypal" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:text="Paypal"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <RadioButton
+                    android:id="@+id/paypal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:buttonTint="@color/black" />
+            </LinearLayout>
+        </LinearLayout>
 
         <!-- Cart Items -->
         <androidx.recyclerview.widget.RecyclerView

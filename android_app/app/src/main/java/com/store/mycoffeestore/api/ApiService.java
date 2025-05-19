@@ -139,4 +139,11 @@ public interface ApiService {
 
     @DELETE("users/{id}")
     Call<Map<String, Boolean>> deleteUser(@Path("id") Long id);
+
+    // ===== ORDERS =====
+    @PATCH("orders/order/{orderID}")
+    Call<Map<String, Object>> updateOrderStatus(@Path("orderID") int orderId, @Body String status);
+
+    @DELETE("orders/order/{orderID}")
+    Call<Boolean> deleteOrder(@Path("orderID") int orderId);
 }

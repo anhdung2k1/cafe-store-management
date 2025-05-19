@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Back Button + Title -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="16dp">
+
+            <ImageView
+                android:id="@+id/backBtn"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_chevron_left"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Order Detail"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <!-- Order ID and Total -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/orderIdText"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Order #1"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/totalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$0.00"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <!-- Order Status -->
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pending"
+            android:textColor="@android:color/darker_gray"
+            android:layout_marginTop="4dp"
+            android:textSize="14sp" />
+
+        <!-- Order Illustration -->
+        <ImageView
+            android:id="@+id/orderImage"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_order" />
+
+        <!-- Customer Info -->
+        <TextView
+            android:id="@+id/customerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Customer: trungtran1"
+            android:textSize="14sp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/addressText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Address: ..."
+            android:textSize="14sp"
+            android:textColor="@color/black" />
+
+        <!-- Update Order Status Label -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Update Order Status:"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/black" />
+
+        <!-- Status Options -->
+        <RadioGroup
+            android:id="@+id/statusGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp">
+
+            <RadioButton
+                android:id="@+id/statusSuccess"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Success" />
+
+            <RadioButton
+                android:id="@+id/statusPending"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pending" />
+
+            <RadioButton
+                android:id="@+id/statusProcessing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Processing" />
+
+            <RadioButton
+                android:id="@+id/statusCompleted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Completed" />
+
+            <RadioButton
+                android:id="@+id/statusCancelled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancelled" />
+        </RadioGroup>
+
+        <!-- Delete Order Button -->
+        <Button
+            android:id="@+id/deleteOrderBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Delete Order"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="@android:color/holo_red_dark" />
+    </LinearLayout>
+</ScrollView>
