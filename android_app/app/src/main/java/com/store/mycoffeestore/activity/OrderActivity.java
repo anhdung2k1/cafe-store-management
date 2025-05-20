@@ -1,6 +1,7 @@
 package com.store.mycoffeestore.activity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,7 +18,6 @@ import com.store.mycoffeestore.helper.NavigationHelper;
 import com.store.mycoffeestore.helper.TokenManager;
 import com.store.mycoffeestore.model.Order;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,15 +28,9 @@ import retrofit2.Response;
 public class OrderActivity extends AppCompatActivity {
 
     private RecyclerView orderRecycler;
-    private final List<Order> orders = new ArrayList<>();
     private OrderAdapter adapter;
     private Long userId;
 
-    /**
-     * Initializes the activity, sets up the order list UI, configures navigation, and begins loading user orders.
-     *
-     * @param savedInstanceState the previously saved state of the activity, if any
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +38,7 @@ public class OrderActivity extends AppCompatActivity {
 
         orderRecycler = findViewById(R.id.orderRecycler);
         orderRecycler.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new OrderAdapter(this, orders);
+        adapter = new OrderAdapter(this);
         orderRecycler.setAdapter(adapter);
 
         BottomNavigationView nav = findViewById(R.id.bottom_navigation);
@@ -53,11 +47,12 @@ public class OrderActivity extends AppCompatActivity {
         fetchUserIdThenOrders();
     }
 
-    /**
-     * Retrieves the current user's ID using their username and loads their orders.
-     *
-     * If the user is not logged in, displays a message and aborts the process. Otherwise, fetches the user ID asynchronously and, upon success, initiates loading of the user's orders. Displays error messages if user ID retrieval fails.
-     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchUserIdThenOrders();
+    }
+
     private void fetchUserIdThenOrders() {
         TokenManager tokenManager = new TokenManager(this);
         String userName = tokenManager.getUserNameFromToken();
@@ -86,32 +81,23 @@ public class OrderActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Retrieves and displays the list of orders for the specified user.
-     *
-     * Initiates an asynchronous API call to fetch orders associated with the given user ID.
-     * Updates the orders list and refreshes the RecyclerView upon successful retrieval.
-     * Shows a toast message if the request fails or returns no data.
-     *
-     * @param userId the ID of the user whose orders are to be loaded
-     */
     private void loadOrders(Long userId) {
         ApiService api = ApiClient.getSecuredApiService(this);
         api.getOrdersByUser(userId).enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<List<Order>> call, @NonNull Response<List<Order>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    orders.clear();
-                    orders.addAll(response.body());
-                    adapter.notifyDataSetChanged();
+                    Log.w("OrderActivity", "orders: " + response.body());
+                    Log.w("OrderActivity", "Total orders received: " + response.body().size());
+                    adapter.setOrders(response.body());
                 } else {
-                    Toast.makeText(OrderActivity.this, "Failed to load orders", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OrderActivity.this, "No orders found", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<List<Order>> call, @NonNull Throwable t) {
-                Toast.makeText(OrderActivity.this, "Error loading orders", Toast.LENGTH_SHORT).show();
+                Toast.makeText(OrderActivity.this, "Failed to load orders", Toast.LENGTH_SHORT).show();
             }
         });
     }

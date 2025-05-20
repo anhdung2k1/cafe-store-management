@@ -36,4 +36,9 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     void insertTransactionWithCustomer(@Param("paymentId") Long paymentId,
                                        @Param("userId") Long userId,
                                        @Param("transactionId") Long transactionId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM user_payment WHERE trans_id = :transId", nativeQuery = true)
+    void deleteTransactionById(@Param("transId") Long transId);
 }

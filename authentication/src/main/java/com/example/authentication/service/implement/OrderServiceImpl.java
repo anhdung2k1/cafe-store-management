@@ -2,6 +2,7 @@ package com.example.authentication.service.implement;
 
 import com.example.authentication.entity.OrderEntity;
 import com.example.authentication.repository.OrderRepository;
+import com.example.authentication.repository.TransactionRepository;
 import com.example.authentication.service.interfaces.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.Map;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-
+    private final TransactionRepository transactionRepository;
     private Map<String, Object> orderMap(OrderEntity orderEntity) {
         return new HashMap<>() {{
             put("orderID", orderEntity.getOrderID());
@@ -62,6 +63,7 @@ public class OrderServiceImpl implements OrderService {
         try {
             OrderEntity orderEntity = orderRepository.findById(orderID).isPresent()
                     ? orderRepository.findById(orderID).get() : null;
+            log.info("getOrderByID(): Order Entity: {}", orderEntity);
             assert orderEntity != null;
             return orderMap(orderEntity);
         } catch (Exception e) {
@@ -75,6 +77,7 @@ public class OrderServiceImpl implements OrderService {
             OrderEntity orderEntity = orderRepository.findById(orderID).isPresent()
                     ? orderRepository.findById(orderID).get() : null;
             assert orderEntity != null;
+            log.info("updateOrder(): Order Entity: {}", orderEntity);
             orderEntity.setOrderStatus(orderStatus);
             orderRepository.save(orderEntity);
             return orderMap(orderEntity);
@@ -89,7 +92,13 @@ public class OrderServiceImpl implements OrderService {
             OrderEntity orderEntity = orderRepository.findById(orderID).isPresent()
                     ? orderRepository.findById(orderID).get() : null;
             assert orderEntity != null;
+            log.info("deleteOrder(): Order Entity: {}", orderEntity);
+            Long transactionId = orderEntity.getTransaction().getTransactionId();
+            log.info("deleteOrder(): Transaction ID: {}", transactionId);
+            transactionRepository.deleteTransactionById(transactionId);
+            log.info("deleteOrder(): Transaction deleted successfully");
             orderRepository.delete(orderEntity);
+            log.info("deleteOrder(): Order deleted successfully");
             return true;
         } catch (Exception e) {
             throw new Exception("Could not retrieve order " + orderID, e);
