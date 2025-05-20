@@ -145,5 +145,5 @@ public interface ApiService {
     Call<Map<String, Object>> updateOrderStatus(@Path("orderID") int orderId, @Body String status);
 
     @DELETE("orders/order/{orderID}")
-    Call<Boolean> deleteOrder(@Path("orderID") int orderId);
+    Call<Map<String, Boolean>> deleteOrder(@Path("orderID") int orderId);
 }

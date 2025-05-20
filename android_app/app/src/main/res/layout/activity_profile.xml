@@ -25,57 +25,68 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="16dp">
 
+                <!-- Background banner -->
                 <ImageView
                     android:id="@+id/imageView"
                     android:layout_width="0dp"
                     android:layout_height="250dp"
-                    android:contentDescription="@string/profile_background"
                     android:scaleType="centerCrop"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:contentDescription="@string/profile_background"
+                    app:srcCompat="@drawable/top_profile_background"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/top_profile_background" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/avatar_card"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
+                <!-- Avatar + Edit in FrameLayout -->
+                <FrameLayout
+                    android:id="@+id/avatar_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="150dp"
-                    android:layout_marginBottom="8dp"
-                    app:cardCornerRadius="75dp"
-                    app:cardElevation="4dp"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
 
-                    <ImageView
-                        android:id="@+id/avatar_image"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:contentDescription="@string/user_avatar"
-                        android:padding="4dp"
-                        app:srcCompat="@drawable/profile_avatar" />
-                </androidx.cardview.widget.CardView>
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/avatar_card"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        app:cardCornerRadius="75dp"
+                        app:cardElevation="4dp">
 
-                <FrameLayout
-                    android:id="@+id/edit_avatar_btn_container"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:layout_constraintBottom_toBottomOf="@+id/avatar_card"
-                    app:layout_constraintEnd_toEndOf="@+id/avatar_card">
+                        <ImageView
+                            android:id="@+id/avatar_image"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:padding="4dp"
+                            android:contentDescription="@string/user_avatar"
+                            app:srcCompat="@drawable/profile_avatar" />
+                    </androidx.cardview.widget.CardView>
 
-                    <ImageView
-                        android:id="@+id/edit_avatar_btn"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:contentDescription="@string/edit_avatar"
-                        android:src="@drawable/ic_edit" />
+                    <FrameLayout
+                        android:id="@+id/edit_avatar_btn_container"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="4dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/edit_btn_background"
+                        android:elevation="8dp"
+                        android:translationZ="8dp">
+
+                        <ImageView
+                            android:id="@+id/edit_avatar_btn"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_edit"
+                            android:contentDescription="@string/edit_avatar" />
+                    </FrameLayout>
                 </FrameLayout>
 
+                <!-- Username -->
                 <TextView
                     android:id="@+id/username"
                     android:layout_width="wrap_content"
@@ -84,10 +95,12 @@
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:textColor="#333"
-                    app:layout_constraintTop_toBottomOf="@id/avatar_card"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintTop_toBottomOf="@id/avatar_container"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
+                <!-- Email -->
                 <TextView
                     android:id="@+id/email"
                     android:layout_width="wrap_content"
@@ -95,13 +108,13 @@
                     android:text="@string/email_example_gmail_com"
                     android:textSize="16sp"
                     android:textColor="#666"
+                    android:layout_marginTop="4dp"
                     app:layout_constraintTop_toBottomOf="@id/username"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginTop="4dp"/>
+                    app:layout_constraintEnd_toEndOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- RecyclerView for user info items -->
+            <!-- RecyclerView for user info -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/profileRecycler"
                 android:layout_width="match_parent"
@@ -114,9 +127,11 @@
         </LinearLayout>
     </ScrollView>
 
-    <include layout="@layout/navigation_bar"
+    <!-- Bottom navigation -->
+    <include
+        layout="@layout/navigation_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

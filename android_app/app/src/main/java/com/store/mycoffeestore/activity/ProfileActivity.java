@@ -1,9 +1,14 @@
 package com.store.mycoffeestore.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -31,11 +36,22 @@ public class ProfileActivity extends AppCompatActivity {
     private RecyclerView profileRecycler;
     private final List<Object[]> profileItems = new ArrayList<>();
     private Long userId;
-    private Users currentUser; /**
-     * Initializes the profile activity, sets up the layout, navigation, and begins loading the user's profile data.
-     *
-     * @param savedInstanceState the previously saved state of the activity, if any
-     */
+    private Users currentUser;
+
+    private ImageView avatarImage;
+
+    // ✅ ActivityResultLauncher để chọn ảnh
+    private final ActivityResultLauncher<Intent> imagePickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Uri selectedImageUri = result.getData().getData();
+                    if (selectedImageUri != null) {
+                        avatarImage.setImageURI(selectedImageUri);
+                        Toast.makeText(this, "Avatar updated locally", Toast.LENGTH_SHORT).show();
+                        // TODO: Gửi URI này lên server nếu cần
+                    }
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +59,21 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         profileRecycler = findViewById(R.id.profileRecycler);
+        avatarImage = findViewById(R.id.avatar_image);
 
         BottomNavigationView nav = findViewById(R.id.bottom_navigation);
         NavigationHelper.setupBottomNavigation(this, nav, R.id.profile_btn);
 
         getUserIdAndLoadProfile();
+
+        // ✅ Gắn sự kiện click vào nút edit avatar
+        findViewById(R.id.edit_avatar_btn).setOnClickListener(v -> openImagePicker());
+    }
+
+    private void openImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        imagePickerLauncher.launch(intent);
     }
 
     private void getUserIdAndLoadProfile() {
@@ -91,7 +117,6 @@ public class ProfileActivity extends AppCompatActivity {
                     String birthDay = (String) user.getOrDefault("birthDay", "");
                     String gender = (String) user.getOrDefault("gender", "");
 
-                    // Khởi tạo Users model
                     currentUser = new Users();
                     currentUser.setUserName(userName);
                     currentUser.setAddress(address);

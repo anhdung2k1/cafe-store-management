@@ -84,6 +84,10 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHold
                     holder.value.setVisibility(View.VISIBLE);
                     holder.editValue.setVisibility(View.GONE);
                     holder.editButton.setImageResource(R.drawable.ic_edit);
+                    holder.isEditing = false;
+
+                    // Cập nhật lại itemList
+                    itemList.set(holder.getAdapterPosition(), new Object[]{title, updatedText, iconResId, false});
 
                     if (listener != null) {
                         listener.onItemClick(title, updatedText);

@@ -47,6 +47,12 @@ public class OrderActivity extends AppCompatActivity {
         fetchUserIdThenOrders();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchUserIdThenOrders();
+    }
+
     private void fetchUserIdThenOrders() {
         TokenManager tokenManager = new TokenManager(this);
         String userName = tokenManager.getUserNameFromToken();

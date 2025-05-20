@@ -57,7 +57,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             OrderEntity orderEntity = new OrderEntity();
             orderEntity.setTransaction(transactionEntity);
-            orderEntity.setOrderStatus("Success");
+            orderEntity.setOrderStatus("SUCCESS");
             orderEntity.setOrderDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             orderEntity.setTotalAmount(transactionEntity.getBillingPayment());
             orderEntity.setUser(userRepository.findById(userId)

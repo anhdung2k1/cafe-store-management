@@ -31,7 +31,7 @@ public class CartActivity extends AppCompatActivity {
     private ImageView ivBack;
     private TextView subTotalPriceTxt, totalTaxPriceTxt, deliveryPriceTxt, totalPriceTxt;
     private EditText addressText;
-    private RadioButton creditCardBtn, cashBtn, momoBtn, paypalBtn;
+    private RadioButton creditCardBtn, cashBtn, bankTransferBtn, paypalBtn;
 
     private final List<ItemsModel> cartItems = new ArrayList<>();
     private final double delivery = 15.0;
@@ -57,8 +57,9 @@ public class CartActivity extends AppCompatActivity {
         addressText = findViewById(R.id.addressText);
         creditCardBtn = findViewById(R.id.creditCard);
         cashBtn = findViewById(R.id.cash);
-        momoBtn = findViewById(R.id.momo);
+        bankTransferBtn = findViewById(R.id.bankTransfer);
         paypalBtn = findViewById(R.id.paypal);
+        cashBtn.setChecked(true);
 
         View.OnClickListener paymentClickListener = v -> {
             clearPaymentSelection();
@@ -67,8 +68,8 @@ public class CartActivity extends AppCompatActivity {
                 creditCardBtn.setChecked(true);
             } else if (id == R.id.row_cash) {
                 cashBtn.setChecked(true);
-            } else if (id == R.id.row_momo) {
-                momoBtn.setChecked(true);
+            } else if (id == R.id.row_bankTransfer) {
+                bankTransferBtn.setChecked(true);
             } else if (id == R.id.row_paypal) {
                 paypalBtn.setChecked(true);
             }
@@ -76,7 +77,7 @@ public class CartActivity extends AppCompatActivity {
 
         findViewById(R.id.row_creditCard).setOnClickListener(paymentClickListener);
         findViewById(R.id.row_cash).setOnClickListener(paymentClickListener);
-        findViewById(R.id.row_momo).setOnClickListener(paymentClickListener);
+        findViewById(R.id.row_bankTransfer).setOnClickListener(paymentClickListener);
         findViewById(R.id.row_paypal).setOnClickListener(paymentClickListener);
 
         findViewById(R.id.proceedCheckoutBtn).setOnClickListener(v -> {
@@ -91,7 +92,7 @@ public class CartActivity extends AppCompatActivity {
     private void clearPaymentSelection() {
         creditCardBtn.setChecked(false);
         cashBtn.setChecked(false);
-        momoBtn.setChecked(false);
+        bankTransferBtn.setChecked(false);
         paypalBtn.setChecked(false);
     }
 
@@ -229,7 +230,7 @@ public class CartActivity extends AppCompatActivity {
                     public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
                         if (Boolean.TRUE.equals(response.body())) {
                             if (!isFinishing()) {
-                                showSuccessDialog();  // Chỉ show dialog nếu activity còn sống
+                                clearCartQuantities();
                             }
                         } else {
                             Toast.makeText(CartActivity.this, "Failed to create transaction", Toast.LENGTH_SHORT).show();
@@ -247,8 +248,8 @@ public class CartActivity extends AppCompatActivity {
     private String getSelectedPaymentMethod() {
         if (creditCardBtn.isChecked()) return "Credit Card";
         if (cashBtn.isChecked()) return "Cash";
-        if (momoBtn.isChecked()) return "MOMO";
-        if (paypalBtn.isChecked()) return "Paypal";
+        if (bankTransferBtn.isChecked()) return "Bank Transfer";
+        if (paypalBtn.isChecked()) return "PayPal";
         return null;
     }
 
@@ -259,6 +260,47 @@ public class CartActivity extends AppCompatActivity {
             return 0.0;
         }
     }
+
+    private void clearCartQuantities() {
+        ApiService api = ApiClient.getSecuredApiService(this);
+
+        if (cartItems.isEmpty()) {
+            showSuccessDialog();
+            return;
+        }
+
+        final int[] processed = {0};
+        for (ItemsModel item : cartItems) {
+            Product product = new Product();
+            product.setProductID(item.getProductID());
+            product.setProductQuantity(0); // Set quantity to 0
+
+            api.updateCart(userId, product).enqueue(new Callback<>() {
+                @Override
+                public void onResponse(@NonNull Call<Map<String, Object>> call, @NonNull Response<Map<String, Object>> response) {
+                    processed[0]++;
+                    if (processed[0] == cartItems.size()) {
+                        cartItems.clear();       // Clear local list
+                        runOnUiThread(() -> {
+                            setupCartAdapter();  // Update RecyclerView
+                            calculateCart();     // Recalculate total
+                            showSuccessDialog(); // Show dialog after all updates
+                        });
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<Map<String, Object>> call, @NonNull Throwable t) {
+                    processed[0]++;
+                    Log.e("CartActivity", "Failed to update product to 0", t);
+                    if (processed[0] == cartItems.size()) {
+                        showSuccessDialog(); // Still show dialog if some failed
+                    }
+                }
+            });
+        }
+    }
+
 
     private void showSuccessDialog() {
         View dialogView = getLayoutInflater().inflate(R.layout.success_dialog, null);
