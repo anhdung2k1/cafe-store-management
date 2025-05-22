@@ -67,10 +67,10 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
             holder.icon.setImageResource(R.drawable.ic_order);
         }
 
-        // Open OrderDetailActivity with full Order object
+        // Mở chi tiết đơn hàng và truyền orderID
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, OrderDetailActivity.class);
-            intent.putExtra("order", order); // Requires Order implements Serializable
+            intent.putExtra("orderID", order.getOrderID());  // CHỈ TRUYỀN orderID
             context.startActivity(intent);
         });
     }

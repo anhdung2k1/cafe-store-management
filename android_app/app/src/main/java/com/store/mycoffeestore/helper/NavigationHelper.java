@@ -11,6 +11,7 @@ import com.store.mycoffeestore.activity.CartActivity;
 import com.store.mycoffeestore.activity.MainActivity;
 import com.store.mycoffeestore.activity.OrderActivity;
 import com.store.mycoffeestore.activity.ProfileActivity;
+import com.store.mycoffeestore.activity.WishlistActivity;
 
 
 public class NavigationHelper {
@@ -45,8 +46,8 @@ public class NavigationHelper {
                 activity.startActivity(new Intent(activity, ProfileActivity.class));
             } else if (itemId == R.id.order_btn) {
                 activity.startActivity(new Intent(activity, OrderActivity.class));
-//            } else if (itemId == R.id.setting_btn) {
-//                activity.startActivity(new Intent(activity, SettingActivity.class));
+            } else if (itemId == R.id.wishlist_btn) {
+                activity.startActivity(new Intent(activity, WishlistActivity.class));
             }
             activity.overridePendingTransition(0, 0);
             return true;

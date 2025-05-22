@@ -52,47 +52,38 @@ public class CartServiceImpl implements CartService {
     @Override
     public Map<String, Object> addCartItems(Long userId, Product product) throws Exception {
         try {
-            UserEntity userEntity = userRepository.findById(userId).get();
-            CartEntity cartEntity;
-            if (cartRepository.getCartEntityWithUserId(userId).isPresent()) {
-                // If the user already have the cart, use the current
-                cartEntity = cartRepository.getCartEntityWithUserId(userId).get();
-            } else {
-                // If the user did not have create the cart create one in DB
-                cartEntity = new CartEntity(userEntity);
-            }
-            if (product != null) {
-                List<ProductEntity> cartProducts = cartEntity.getProducts();
-                if (cartProducts == null) {
-                    cartProducts = new ArrayList<>();
-                }
-                if (productRepository.findById(product.getProductID()).isPresent()) {
-                    ProductEntity productAddEntity = productRepository.findById(product.getProductID()).get();
+            UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new Exception("User not found"));
+            CartEntity cartEntity = cartRepository.getCartEntityWithUserId(userId)
+                    .orElse(new CartEntity(userEntity));
 
-                    if (cartProducts != null) {
-                        // Update the quantity if the item has been created
-                        int index = cartProducts.indexOf(productAddEntity);
-                        if (index != -1) {
-                            productAddEntity.setProductQuantity(productAddEntity.getProductQuantity() + 1);
-                            cartProducts.set(index, productAddEntity);
-                        }
-                        else {
-                            log.warn("The product did not exists");
-                            productAddEntity.setProductQuantity(1);
-                            cartProducts.add(productAddEntity);
-                        }
-                    }
-                    // Update the carts
-                    cartEntity.setProducts(cartProducts);
-                    cartRepository.save(cartEntity);
+            if (product != null && product.getProductID() != null) {
+                List<ProductEntity> cartProducts = cartEntity.getProducts() != null
+                        ? cartEntity.getProducts() : new ArrayList<>();
+
+                ProductEntity productAddEntity = productRepository.findById(product.getProductID())
+                        .orElseThrow(() -> new Exception("Product not found"));
+
+                int index = cartProducts.indexOf(productAddEntity);
+
+                if (index != -1) {
+                    // If product exists in cart → update quantity by adding new
+                    ProductEntity existing = cartProducts.get(index);
+                    int updatedQty = existing.getProductQuantity() + product.getProductQuantity();
+                    existing.setProductQuantity(updatedQty);
+                    cartProducts.set(index, existing);
+                } else {
+                    // New product → set quantity from client
+                    productAddEntity.setProductQuantity(product.getProductQuantity());
+                    cartProducts.add(productAddEntity);
                 }
-                else {
-                    log.warn("The product ID given is not present: " + product.getProductID());
-                }
+
+                cartEntity.setProducts(cartProducts);
+                cartRepository.save(cartEntity);
             }
+
             return cartMap(cartEntity);
-        } catch (NoSuchElementException e) {
-            throw new Exception("Could not get cart items " + e.getMessage());
+        } catch (Exception e) {
+            throw new Exception("Could not add product to cart: " + e.getMessage(), e);
         }
     }
 

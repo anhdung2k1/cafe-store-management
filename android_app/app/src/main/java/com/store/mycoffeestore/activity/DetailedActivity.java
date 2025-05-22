@@ -18,12 +18,14 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.store.mycoffeestore.R;
 import com.store.mycoffeestore.adapter.SizeAdapter;
 import com.store.mycoffeestore.api.ApiClient;
+import com.store.mycoffeestore.api.ApiService;
 import com.store.mycoffeestore.helper.SizeSelectListener;
 import com.store.mycoffeestore.helper.TokenManager;
 import com.store.mycoffeestore.model.ItemsModel;
 import com.store.mycoffeestore.model.Product;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -34,14 +36,15 @@ public class DetailedActivity extends AppCompatActivity {
 
     private ItemsModel item;
     private Long userId;
-    private String selectedSize = "1"; // default
+    private String selectedSize = "1";
+    private boolean isInWishlist = false;
 
     private ShapeableImageView shapeableImageView;
     private TextView titleTxt, descriptionTxt, priceTxt, numberItemTxt, plusCart, minusCart;
     private RatingBar ratingBar;
     private RecyclerView rvSizeList;
     private Button addToCart;
-    private ImageView ivBack;
+    private ImageView ivBack, ivFavourite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,7 @@ public class DetailedActivity extends AppCompatActivity {
         ivBack = findViewById(R.id.ivBack);
         plusCart = findViewById(R.id.plusCart);
         minusCart = findViewById(R.id.minusCart);
+        ivFavourite = findViewById(R.id.ivFavourite);
     }
 
     private void initSizeList() {
@@ -75,13 +79,7 @@ public class DetailedActivity extends AppCompatActivity {
         sizeList.add("3");
         sizeList.add("4");
 
-        SizeAdapter adapter = new SizeAdapter(this, sizeList, new SizeSelectListener() {
-            @Override
-            public void onSizeSelected(String size) {
-                selectedSize = size;
-            }
-        });
-
+        SizeAdapter adapter = new SizeAdapter(this, sizeList, size -> selectedSize = size);
         rvSizeList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rvSizeList.setAdapter(adapter);
 
@@ -124,8 +122,21 @@ public class DetailedActivity extends AppCompatActivity {
             });
 
             addToCart.setOnClickListener(v -> {
-                item.setNumberInCart(Integer.parseInt(numberItemTxt.getText().toString()));
+                int quantity = Integer.parseInt(numberItemTxt.getText().toString());
+                if (quantity <= 0) {
+                    Toast.makeText(this, "Please select at least 1 item", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                item.setNumberInCart(quantity);
                 addItemToCart();
+            });
+
+            ivFavourite.setOnClickListener(v -> {
+                if (!isInWishlist) {
+                    addToWishlist();
+                } else {
+                    Toast.makeText(this, "Already in wishlist", Toast.LENGTH_SHORT).show();
+                }
             });
         }
     }
@@ -140,12 +151,13 @@ public class DetailedActivity extends AppCompatActivity {
         }
 
         ApiClient.getSecuredApiService(this).getUserIdByUserName(userName)
-                .enqueue(new Callback<Map<String, Long>>() {
+                .enqueue(new Callback<>() {
                     @Override
                     public void onResponse(@NonNull Call<Map<String, Long>> call, @NonNull Response<Map<String, Long>> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             userId = response.body().get("id");
-                            Log.d("DetailedActivity", "DetailedActivity(...): userId = " + userId);
+                            Log.d("DetailedActivity", "userId = " + userId);
+                            checkIfInWishlist();
                         } else {
                             Toast.makeText(DetailedActivity.this, "Cannot get userId", Toast.LENGTH_SHORT).show();
                         }
@@ -169,13 +181,13 @@ public class DetailedActivity extends AppCompatActivity {
 
         ApiClient.getSecuredApiService(this)
                 .addToCart(userId, product)
-                .enqueue(new Callback<Map<String, Object>>() {
+                .enqueue(new Callback<>() {
                     @Override
                     public void onResponse(@NonNull Call<Map<String, Object>> call, @NonNull Response<Map<String, Object>> response) {
                         if (response.isSuccessful()) {
                             Toast.makeText(DetailedActivity.this, "Added to cart!", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(DetailedActivity.this, "Failed to add", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(DetailedActivity.this, "Failed to add to cart", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -183,6 +195,63 @@ public class DetailedActivity extends AppCompatActivity {
                     public void onFailure(@NonNull Call<Map<String, Object>> call, @NonNull Throwable t) {
                         Toast.makeText(DetailedActivity.this, "Network error", Toast.LENGTH_SHORT).show();
                         Log.e("AddToCart", "Error: ", t);
+                    }
+                });
+    }
+
+    private void addToWishlist() {
+        if (userId == null) {
+            Toast.makeText(this, "User ID not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Product product = getProduct();
+
+        ApiClient.getSecuredApiService(this)
+                .addToWishlist(userId, product)
+                .enqueue(new Callback<>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Map<String, Object>> call, @NonNull Response<Map<String, Object>> response) {
+                        if (response.isSuccessful()) {
+                            isInWishlist = true;
+                            ivFavourite.setImageResource(R.drawable.ic_favorite_filled);
+                            Toast.makeText(DetailedActivity.this, "Added to wishlist!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(DetailedActivity.this, "Failed to add to wishlist", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<Map<String, Object>> call, @NonNull Throwable t) {
+                        Toast.makeText(DetailedActivity.this, "Error adding to wishlist", Toast.LENGTH_SHORT).show();
+                        Log.e("Wishlist", "addToWishlist error", t);
+                    }
+                });
+    }
+
+    private void checkIfInWishlist() {
+        if (userId == null || item == null) return;
+
+        ApiClient.getSecuredApiService(this).getWishlist(userId)
+                .enqueue(new Callback<>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Map<String, Object>> call, @NonNull Response<Map<String, Object>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            List<Map<String, Object>> productMaps = (List<Map<String, Object>>) response.body().get("products");
+                            for (Map<String, Object> productMap : productMaps) {
+                                Long productId = ((Number) productMap.get("productID")).longValue();
+                                if (productId.equals(item.getProductID())) {
+                                    isInWishlist = true;
+                                    ivFavourite.setImageResource(R.drawable.ic_favorite_filled);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<Map<String, Object>> call, @NonNull Throwable t) {
+                        Log.e("DetailedActivity", "checkIfInWishlist failed", t);
                     }
                 });
     }
