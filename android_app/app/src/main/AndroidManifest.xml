@@ -47,6 +47,8 @@
             android:exported="false"/>
         <activity android:name=".activity.OrderDetailActivity"
             android:exported="false"/>
+        <activity android:name=".activity.WishlistActivity"
+            android:exported="false"/>
         <activity
             android:name=".activity.IntroActivity"
             android:exported="true">

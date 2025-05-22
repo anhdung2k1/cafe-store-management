@@ -63,4 +63,23 @@ public class ItemsModel implements Parcelable {
             return new ItemsModel[size];
         }
     };
+
+    public static ItemsModel fromProduct(Product product) {
+        ItemsModel item = new ItemsModel();
+        item.setProductID(product.getProductID());
+        item.setTitle(product.getProductName());
+        item.setDescription(product.getProductDescription());
+        item.setPrice(product.getProductPrice());
+        item.setRating(4.0f); // hoặc set từ product nếu có rating
+        item.setNumberInCart(product.getProductQuantity());
+        item.setExtra(product.getProductModel());
+
+        ArrayList<String> picUrls = new ArrayList<>();
+        if (product.getImageUrl() != null) {
+            picUrls.add(product.getImageUrl());
+        }
+        item.setPicUrl(picUrls);
+
+        return item;
+    }
 }
